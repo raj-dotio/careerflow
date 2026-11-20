@@ -24,6 +24,7 @@ import {
 
 import femaleAiVideo from '../assets/videos/female-ai.mp4';
 import maleAiVideo from '../assets/videos/male-ai.mp4';
+import logo2 from '../assets/new2.png';
 
 // Types
 type CompanyId = 'google' | 'microsoft' | 'amazon' | 'stripe';
@@ -316,57 +317,62 @@ export default function Home() {
       </div>
 
       {/* =========================================================================
-          1. TOP NAVIGATION BAR (Capsule Header from Akai Ito Reference)
+          1. TOP NAVIGATION BAR (Clean, Minimal, Transparent Header)
       ========================================================================= */}
-      <header className="sticky top-0 z-50 pt-4 px-4 pb-2 bg-[#faf8f5]/90 backdrop-blur-sm">
-        <div className="max-w-[1120px] mx-auto flex items-center justify-between gap-4">
-          {/* Brand Pill / Logo Box with red hand-drawn border */}
-          <a
-            href="#"
-            className="flex items-center gap-2.5 px-3.5 py-1.5 bg-white sketch-border-sm hover:translate-y-[-1px] transition-transform"
+      <header className="sticky top-0 z-50 pt-3 px-4 sm:px-6 pb-2.5 bg-[#faf8f5]/90 backdrop-blur-md">
+        <div className="max-w-[1240px] mx-auto flex items-center justify-between gap-6">
+          {/* Brand Logo - Enlarged */}
+          <Link
+            to="/"
+            className="flex items-center gap-2 hover:opacity-90 transition-opacity shrink-0"
           >
-            <div className="w-7 h-7 rounded-[6px] bg-[#e11d48] border border-[#18181b] flex items-center justify-center p-1 shadow-xs">
-              <GraduationCap className="w-full h-full text-white" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-extrabold text-[16px] tracking-tight text-[#18181b] leading-none">
-                CareerFlow
-              </span>
-              <span className="text-[10px] text-[#e11d48] font-mono font-bold tracking-wider">
-                STUDENT SIMULATION
-              </span>
-            </div>
-          </a>
+            <img src={logo2} alt="CareerFlow Logo" className="h-12 sm:h-14 md:h-16 w-auto object-contain" />
+          </Link>
 
-          {/* Central Black Pill Navigation (Directly modeled on Akai Ito App Bar) */}
-          <nav className="hidden md:flex items-center bg-[#141416] text-[#f4f4f5] px-4 py-2 rounded-full border border-black shadow-md space-x-4 text-[12px] font-semibold">
-            <Link to="/builder" className="hover:text-[#e11d48] transition-colors flex items-center gap-1.5 whitespace-nowrap">
-              <FileText className="w-3.5 h-3.5 text-white/70" />
+          {/* Central Navigation - Minimal & Spaced Out (No Black Pill BG) */}
+          <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-[13.5px] lg:text-[14px] font-semibold text-[#3f3f46]">
+            <Link
+              to="/builder"
+              className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
+            >
+              <FileText className="w-4 h-4 text-[#71717a]" />
               <span>Resume Builder</span>
             </Link>
-            <Link to="/ats" className="hover:text-[#e11d48] transition-colors flex items-center gap-1.5 whitespace-nowrap">
-              <Sparkles className="w-3.5 h-3.5 text-[#e11d48]" />
+            <Link
+              to="/ats"
+              className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
+            >
+              <Sparkles className="w-4 h-4 text-[#e11d48]" />
               <span>ATS Diagnostics</span>
             </Link>
-            <a href="#ai-chamber" className="text-[#e11d48] flex items-center gap-1.5 whitespace-nowrap">
-              <Bot className="w-3.5 h-3.5 text-[#e11d48]" />
+            <a
+              href="#ai-chamber"
+              className="flex items-center gap-2 text-[#e11d48] hover:text-[#be123c] transition-colors whitespace-nowrap font-bold"
+            >
+              <Bot className="w-4 h-4 text-[#e11d48]" />
               <span>AI Mock Chamber</span>
             </a>
-            <a href="#journey" className="hover:text-[#e11d48] transition-colors flex items-center gap-1.5 whitespace-nowrap">
-              <BookOpen className="w-3.5 h-3.5 text-white/70" />
+            <a
+              href="#journey"
+              className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
+            >
+              <BookOpen className="w-4 h-4 text-[#71717a]" />
               <span>Milestones</span>
             </a>
-            <a href="#student-quiz" className="hover:text-[#e11d48] transition-colors flex items-center gap-1.5 whitespace-nowrap">
-              <Zap className="w-3.5 h-3.5 text-white/70" />
+            <a
+              href="#student-quiz"
+              className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
+            >
+              <Zap className="w-4 h-4 text-[#71717a]" />
               <span>Quick Challenge</span>
             </a>
           </nav>
 
-          {/* Right Action Buttons: Same White Sketch Background, Clean Icons, Single Line */}
-          <div className="flex items-center gap-2.5">
+          {/* Right Action Buttons */}
+          <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={handleTossCaps}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#141416] sketch-border-sm text-[12px] font-bold hover:bg-[#f4f4f5] active:scale-95 transition-all whitespace-nowrap cursor-pointer"
+              className="hidden lg:flex items-center gap-1.5 px-3.5 py-1.5 bg-white text-[#141416] sketch-border-sm text-[12px] font-bold hover:bg-[#f4f4f5] active:scale-95 transition-all whitespace-nowrap cursor-pointer"
               title="Click to celebrate and toss graduation hats!"
             >
               <GraduationCap className="w-3.5 h-3.5 text-[#e11d48]" />
@@ -374,7 +380,7 @@ export default function Home() {
             </button>
             <a
               href="#simulation"
-              className="flex items-center gap-2 px-3.5 py-1.5 bg-white text-[#141416] sketch-border-sm text-[12px] font-bold hover:bg-[#f4f4f5] transition-all whitespace-nowrap"
+              className="flex items-center gap-2 px-4 py-2 bg-white text-[#141416] sketch-border-sm text-[12px] font-bold hover:bg-[#f4f4f5] transition-all whitespace-nowrap shadow-xs"
             >
               <span className="w-2 h-2 rounded-full bg-[#e11d48] animate-ping shrink-0" />
               <span className="whitespace-nowrap">Join Placement Cohort</span>
@@ -1154,10 +1160,7 @@ export default function Home() {
         <div className="max-w-[1080px] mx-auto space-y-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pb-6 border-b-2 border-dashed border-[#e5e7eb]">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-[8px] bg-[#e11d48] border-2 border-[#18181b] flex items-center justify-center text-white">
-                <GraduationCap className="w-5 h-5" />
-              </div>
-              <span className="font-extrabold text-[18px] text-[#141416]">CareerFlow</span>
+              <img src={logo2} alt="CareerFlow Logo" className="h-8 w-auto object-contain" />
               <span className="text-[12px] text-[#9ca3af]">· Campus Placement Intelligence Platform</span>
             </div>
 

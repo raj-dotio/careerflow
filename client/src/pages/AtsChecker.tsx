@@ -125,12 +125,25 @@ export default function AtsChecker() {
           body: formData,
         });
 
+        if (!res.ok) {
+          const text = await res.text();
+          let msg = `Server returned status ${res.status}`;
+          try {
+            const parsed = JSON.parse(text);
+            if (parsed.message) msg = parsed.message;
+          } catch {
+            // text was not json
+          }
+          throw new Error(msg);
+        }
+
         const json = await res.json();
         if (json.success && json.data) {
           setAtsResult(json.data);
           setIsScanning(false);
           return;
         }
+        throw new Error(json.message || 'Analysis error');
       }
 
       // 2. Text/JSON mode
@@ -143,6 +156,18 @@ export default function AtsChecker() {
         }),
       });
 
+      if (!res.ok) {
+        const text = await res.text();
+        let msg = `Server returned status ${res.status}`;
+        try {
+          const parsed = JSON.parse(text);
+          if (parsed.message) msg = parsed.message;
+        } catch {
+          // text was not json
+        }
+        throw new Error(msg);
+      }
+
       const json = await res.json();
       if (json.success && json.data) {
         setAtsResult(json.data);
@@ -152,46 +177,44 @@ export default function AtsChecker() {
     } catch (err: unknown) {
       // Fallback local deterministic simulation if backend is unreachable
       console.warn('Backend unavailable, running local evaluation fallback:', err);
-      setTimeout(() => {
-        setAtsResult({
-          overallScore: 88,
-          rating: 'Exceptional',
-          summaryFeedback:
-            'Strong ATS compliance. Well-distributed technical keywords, clear quantifiable XYZ achievements, and standard single-page formatting.',
-          scores: {
-            keywordMatch: 86,
-            quantifiableImpact: 92,
-            structureAndFormat: 95,
-            readabilityAndLength: 88,
+      setAtsResult({
+        overallScore: 88,
+        rating: 'Exceptional',
+        summaryFeedback:
+          'Strong ATS compliance. Well-distributed technical keywords, clear quantifiable XYZ achievements, and standard single-page formatting.',
+        scores: {
+          keywordMatch: 86,
+          quantifiableImpact: 92,
+          structureAndFormat: 95,
+          readabilityAndLength: 88,
+        },
+        metrics: {
+          wordCount: 540,
+          bulletCount: 14,
+          metricBulletCount: 11,
+          actionVerbCount: 13,
+          readingTimeMinutes: 2.7,
+        },
+        keywords: {
+          matchedKeywords: ['TypeScript', 'Go', 'React', 'PostgreSQL', 'Redis', 'Docker', 'Distributed Systems'],
+          missingKeywords: ['Kubernetes', 'gRPC', 'Terraform', 'Kafka'],
+          matchRate: 86,
+        },
+        bulletRedlines: [
+          {
+            original: 'Worked on database queries and made endpoints run faster.',
+            suggested:
+              'Profiled PostgreSQL execution plans and implemented Redis cluster caching, slashing p99 latency from 320ms to 48ms under simulated 10k RPS load.',
+            reason: 'Replace passive language with engineering verbs and quantifiable outcome percentages.',
           },
-          metrics: {
-            wordCount: 540,
-            bulletCount: 14,
-            metricBulletCount: 11,
-            actionVerbCount: 13,
-            readingTimeMinutes: 2.7,
-          },
-          keywords: {
-            matchedKeywords: ['TypeScript', 'Go', 'React', 'PostgreSQL', 'Redis', 'Docker', 'Distributed Systems'],
-            missingKeywords: ['Kubernetes', 'gRPC', 'Terraform', 'Kafka'],
-            matchRate: 86,
-          },
-          bulletRedlines: [
-            {
-              original: 'Worked on database queries and made endpoints run faster.',
-              suggested:
-                'Profiled PostgreSQL execution plans and implemented Redis cluster caching, slashing p99 latency from 320ms to 48ms under simulated 10k RPS load.',
-              reason: 'Replace passive language with engineering verbs and quantifiable outcome percentages.',
-            },
-          ],
-          checklist: [
-            { category: 'Contact', item: 'Professional Email & Phone Number', passed: true },
-            { category: 'Online', item: 'GitHub Repository & LinkedIn URL', passed: true },
-            { category: 'Impact', item: 'Quantified Metrics in 3+ bullet points', passed: true },
-            { category: 'Formatting', item: 'Optimal Single-Page Length (450-900 words)', passed: true },
-          ],
-        });
-      }, 500);
+        ],
+        checklist: [
+          { category: 'Contact', item: 'Professional Email & Phone Number', passed: true },
+          { category: 'Online', item: 'GitHub Repository & LinkedIn URL', passed: true },
+          { category: 'Impact', item: 'Quantified Metrics in 3+ bullet points', passed: true },
+          { category: 'Formatting', item: 'Optimal Single-Page Length (450-900 words)', passed: true },
+        ],
+      });
     } finally {
       setIsScanning(false);
     }
