@@ -376,14 +376,26 @@ export default function ResumeBuilder() {
         </div>
       </header>
 
-      {/* 2. Main Workspace Layout */}
-      <div className="max-w-[1500px] mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* 2. Page Sub-Header / Status Banner (Full width across top so both main cards start at exact same level) */}
+      <div className="no-print max-w-[1500px] mx-auto px-4 sm:px-6 pt-5 pb-1 flex flex-wrap items-center justify-between gap-3">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-white sketch-border-sm text-[12px] font-bold text-[#141416]">
+          <Flame className="w-3.5 h-3.5 text-[#e11d48]" />
+          <span>Campus Placement Simulator · Reactive Resume Engine</span>
+        </div>
+        <span className="font-hand text-[16px] text-[#e11d48] font-bold transform -rotate-1">
+          ✨ Live Real-Time ATS Rendered Preview · Auto-Saved
+        </span>
+      </div>
+
+      {/* 3. Main Workspace Layout - Left & Right Columns Aligned at Exact Same Level */}
+      <div className="max-w-[1500px] mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* =========================================================
             LEFT COLUMN: SECTION ACCORDION FORM EDITOR (No Print)
+            Styled with organic hand-drawn sketch-border like Image 1
         ========================================================= */}
-        <div className="no-print lg:col-span-5 bg-white rounded-2xl border-2 border-[#18181b] shadow-[4px_4px_0px_#18181b] flex flex-col h-[calc(100vh-100px)] overflow-hidden">
+        <div className="no-print lg:col-span-5 bg-white sketch-border flex flex-col h-[calc(100vh-135px)] lg:sticky lg:top-[85px] overflow-hidden">
           {/* Section Navigation Tabs */}
-          <div className="border-b-2 border-[#18181b] p-2 flex overflow-x-auto gap-1.5 bg-[#faf8f5]">
+          <div className="border-b-2 border-[#18181b] p-2.5 flex overflow-x-auto gap-1.5 bg-[#faf8f5]">
             {[
               { id: 'basics', label: 'Basics', icon: User },
               { id: 'experience', label: 'Experience', icon: Briefcase },
@@ -399,10 +411,10 @@ export default function ResumeBuilder() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as 'basics' | 'experience' | 'education' | 'skills' | 'projects' | 'awards' | 'style')}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[12px] font-bold whitespace-nowrap transition-all cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-bold whitespace-nowrap transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-[#e11d48] text-white border-2 border-[#18181b] shadow-[2px_2px_0px_#18181b]'
-                      : 'bg-white text-[#3f3f46] border-2 border-transparent hover:border-[#18181b] hover:shadow-[1px_1px_0px_#18181b]'
+                      ? 'bg-[#e11d48] text-white sketch-border-sm'
+                      : 'bg-white text-[#3f3f46] hover:bg-[#ffe4e6] border border-[#18181b]/30 rounded-[10px]'
                   }`}
                 >
                   <IconComp className="w-3.5 h-3.5" />
@@ -434,7 +446,7 @@ export default function ResumeBuilder() {
                       setResume({ ...resume, basics: { ...resume.basics, name: e.target.value } })
                     }
                     placeholder="e.g. Rahul Sharma"
-                    className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all"
+                    className="w-full px-3.5 py-2.5 sketch-border-sm text-[13px] bg-white font-medium text-[#18181b] focus:outline-none focus:border-[#e11d48] transition-all"
                   />
                 </div>
 
@@ -447,7 +459,7 @@ export default function ResumeBuilder() {
                       setResume({ ...resume, basics: { ...resume.basics, headline: e.target.value } })
                     }
                     placeholder="e.g. Full-Stack Software Engineer"
-                    className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all"
+                    className="w-full px-3.5 py-2.5 sketch-border-sm text-[13px] bg-white font-medium text-[#18181b] focus:outline-none focus:border-[#e11d48] transition-all"
                   />
                 </div>
 
@@ -461,7 +473,7 @@ export default function ResumeBuilder() {
                         setResume({ ...resume, basics: { ...resume.basics, email: e.target.value } })
                       }
                       placeholder="rahul@example.com"
-                      className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all"
+                      className="w-full px-3.5 py-2.5 sketch-border-sm text-[13px] bg-white font-medium text-[#18181b] focus:outline-none focus:border-[#e11d48] transition-all"
                     />
                   </div>
                   <div>
@@ -473,7 +485,7 @@ export default function ResumeBuilder() {
                         setResume({ ...resume, basics: { ...resume.basics, phone: e.target.value } })
                       }
                       placeholder="+91 98765 43210"
-                      className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all"
+                      className="w-full px-3.5 py-2.5 sketch-border-sm text-[13px] bg-white font-medium text-[#18181b] focus:outline-none focus:border-[#e11d48] transition-all"
                     />
                   </div>
                 </div>
@@ -488,7 +500,7 @@ export default function ResumeBuilder() {
                         setResume({ ...resume, basics: { ...resume.basics, location: e.target.value } })
                       }
                       placeholder="Bengaluru, India"
-                      className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all"
+                      className="w-full px-3.5 py-2.5 sketch-border-sm text-[13px] bg-white font-medium text-[#18181b] focus:outline-none focus:border-[#e11d48] transition-all"
                     />
                   </div>
                   <div>
@@ -500,7 +512,7 @@ export default function ResumeBuilder() {
                         setResume({ ...resume, basics: { ...resume.basics, url: e.target.value } })
                       }
                       placeholder="https://rahul.dev"
-                      className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all"
+                      className="w-full px-3.5 py-2.5 sketch-border-sm text-[13px] bg-white font-medium text-[#18181b] focus:outline-none focus:border-[#e11d48] transition-all"
                     />
                   </div>
                 </div>
@@ -515,7 +527,7 @@ export default function ResumeBuilder() {
                         setResume({ ...resume, basics: { ...resume.basics, github: e.target.value } })
                       }
                       placeholder="github.com/rahul"
-                      className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all"
+                      className="w-full px-3.5 py-2.5 sketch-border-sm text-[13px] bg-white font-medium text-[#18181b] focus:outline-none focus:border-[#e11d48] transition-all"
                     />
                   </div>
                   <div>
@@ -527,7 +539,7 @@ export default function ResumeBuilder() {
                         setResume({ ...resume, basics: { ...resume.basics, linkedin: e.target.value } })
                       }
                       placeholder="linkedin.com/in/rahul"
-                      className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all"
+                      className="w-full px-3.5 py-2.5 sketch-border-sm text-[13px] bg-white font-medium text-[#18181b] focus:outline-none focus:border-[#e11d48] transition-all"
                     />
                   </div>
                 </div>
@@ -541,7 +553,7 @@ export default function ResumeBuilder() {
                     value={resume.summary}
                     onChange={(e) => setResume({ ...resume, summary: e.target.value })}
                     placeholder="Brief 2-3 sentence overview of your technical background, core impact, and target placement goals..."
-                    className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all leading-relaxed"
+                    className="w-full px-3.5 py-2.5 sketch-border-sm text-[13px] bg-white font-medium text-[#18181b] focus:outline-none focus:border-[#e11d48] transition-all leading-relaxed"
                   />
                 </div>
               </div>
@@ -564,7 +576,7 @@ export default function ResumeBuilder() {
                 </div>
 
                 {resume.sections.experience.map((exp, idx) => (
-                  <div key={exp.id || idx} className="p-4 rounded-xl border-2 border-[#18181b] bg-[#faf8f5] shadow-[2px_2px_0px_#18181b] space-y-3">
+                  <div key={exp.id || idx} className="p-4 sketch-border-sm bg-[#faf8f5] space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="inline-block px-2.5 py-0.5 bg-[#ffe4e6] text-[#e11d48] font-mono font-bold text-[11px] rounded-md border border-[#e11d48]/30">
                         ROLE #{idx + 1}
@@ -594,7 +606,7 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white font-bold focus:outline-none focus:border-[#e11d48]"
+                        className="px-3 py-2 sketch-border-sm text-[12px] bg-white font-bold focus:outline-none focus:border-[#e11d48]"
                       />
                       <input
                         placeholder="Position Title"
@@ -611,7 +623,7 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white font-medium focus:outline-none focus:border-[#e11d48]"
+                        className="px-3 py-2 sketch-border-sm text-[12px] bg-white font-medium focus:outline-none focus:border-[#e11d48]"
                       />
                     </div>
 
@@ -631,7 +643,7 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white font-mono focus:outline-none focus:border-[#e11d48]"
+                        className="px-3 py-2 sketch-border-sm text-[12px] bg-white font-mono focus:outline-none focus:border-[#e11d48]"
                       />
                       <input
                         placeholder="Location (e.g. Remote / Bengaluru)"
@@ -648,7 +660,7 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
+                        className="px-3 py-2 sketch-border-sm text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
                       />
                     </div>
 
@@ -672,7 +684,7 @@ export default function ResumeBuilder() {
                           }));
                         }}
                         placeholder="• Architected backend microservices using Node.js and TypeScript, decreasing response time by 35%."
-                        className="w-full px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white focus:outline-none focus:border-[#e11d48] leading-relaxed"
+                        className="w-full px-3 py-2 sketch-border-sm text-[12px] bg-white focus:outline-none focus:border-[#e11d48] leading-relaxed"
                       />
                     </div>
                   </div>
@@ -697,7 +709,7 @@ export default function ResumeBuilder() {
                 </div>
 
                 {resume.sections.education.map((edu, idx) => (
-                  <div key={edu.id || idx} className="p-4 rounded-xl border-2 border-[#18181b] bg-[#faf8f5] shadow-[2px_2px_0px_#18181b] space-y-3">
+                  <div key={edu.id || idx} className="p-4 sketch-border-sm bg-[#faf8f5] space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="inline-block px-2.5 py-0.5 bg-[#ffe4e6] text-[#e11d48] font-mono font-bold text-[11px] rounded-md border border-[#e11d48]/30">
                         DEGREE #{idx + 1}
@@ -725,7 +737,7 @@ export default function ResumeBuilder() {
                           },
                         }));
                       }}
-                      className="w-full px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white font-bold focus:outline-none focus:border-[#e11d48]"
+                      className="w-full px-3 py-2 sketch-border-sm text-[12px] bg-white font-bold focus:outline-none focus:border-[#e11d48]"
                     />
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -744,7 +756,7 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
+                        className="px-3 py-2 sketch-border-sm text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
                       />
                       <input
                         placeholder="GPA / Score (e.g. 8.8 CGPA)"
@@ -761,7 +773,7 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
+                        className="px-3 py-2 sketch-border-sm text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
                       />
                     </div>
 
@@ -780,7 +792,7 @@ export default function ResumeBuilder() {
                           },
                         }));
                       }}
-                      className="w-full px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white font-mono focus:outline-none focus:border-[#e11d48]"
+                      className="w-full px-3 py-2 sketch-border-sm text-[12px] bg-white font-mono focus:outline-none focus:border-[#e11d48]"
                     />
                   </div>
                 ))}
@@ -806,7 +818,7 @@ export default function ResumeBuilder() {
                     value={newSkillGroup}
                     onChange={(e) => setNewSkillGroup(e.target.value)}
                     placeholder="New Skill Group (e.g. DevOps & Cloud)"
-                    className="flex-1 px-3.5 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
+                    className="flex-1 px-3.5 py-2 sketch-border-sm text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
                   />
                   <button
                     onClick={addSkillGroup}
@@ -817,7 +829,7 @@ export default function ResumeBuilder() {
                 </div>
 
                 {resume.sections.skills.map((group) => (
-                  <div key={group.id} className="p-4 rounded-xl border-2 border-[#18181b] bg-[#faf8f5] shadow-[2px_2px_0px_#18181b] space-y-2.5">
+                  <div key={group.id} className="p-4 sketch-border-sm bg-[#faf8f5] space-y-2.5">
                     <div className="flex items-center justify-between">
                       <span className="font-extrabold text-[13px] text-[#18181b]">{group.name}</span>
                       <button
@@ -841,7 +853,7 @@ export default function ResumeBuilder() {
                       {group.keywords.map((kw, i) => (
                         <span
                           key={i}
-                          className="px-2.5 py-1 bg-white border-2 border-[#18181b] rounded-lg text-[11px] font-bold text-[#141416] shadow-[1px_1px_0px_#18181b] flex items-center gap-1.5"
+                          className="px-2.5 py-1 bg-white sketch-border-sm text-[11px] font-bold text-[#141416] flex items-center gap-1.5"
                         >
                           {kw}
                           <button
@@ -862,7 +874,7 @@ export default function ResumeBuilder() {
                         onChange={(e) => setNewSkillTag({ ...newSkillTag, [group.id]: e.target.value })}
                         onKeyDown={(e) => e.key === 'Enter' && addKeywordToSkill(group.id)}
                         placeholder="Add skill tag (press Enter)..."
-                        className="flex-1 px-3 py-1.5 text-[11px] rounded-lg border-2 border-[#18181b] bg-white focus:outline-none focus:border-[#e11d48]"
+                        className="flex-1 px-3 py-1.5 text-[11px] sketch-border-sm bg-white focus:outline-none focus:border-[#e11d48]"
                       />
                       <button
                         onClick={() => addKeywordToSkill(group.id)}
@@ -893,7 +905,7 @@ export default function ResumeBuilder() {
                 </div>
 
                 {resume.sections.projects.map((proj, idx) => (
-                  <div key={proj.id || idx} className="p-4 rounded-xl border-2 border-[#18181b] bg-[#faf8f5] shadow-[2px_2px_0px_#18181b] space-y-2.5">
+                  <div key={proj.id || idx} className="p-4 sketch-border-sm bg-[#faf8f5] space-y-2.5">
                     <div className="flex items-center justify-between">
                       <span className="inline-block px-2.5 py-0.5 bg-[#ffe4e6] text-[#e11d48] font-mono font-bold text-[11px] rounded-md border border-[#e11d48]/30">
                         PROJECT #{idx + 1}
@@ -922,7 +934,7 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white font-bold focus:outline-none focus:border-[#e11d48]"
+                        className="px-3 py-2 sketch-border-sm text-[12px] bg-white font-bold focus:outline-none focus:border-[#e11d48]"
                       />
                       <input
                         placeholder="GitHub / Live Demo Link"
@@ -939,7 +951,7 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
+                        className="px-3 py-2 sketch-border-sm text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
                       />
                     </div>
 
@@ -959,7 +971,7 @@ export default function ResumeBuilder() {
                           },
                         }));
                       }}
-                      className="w-full px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white focus:outline-none focus:border-[#e11d48] leading-relaxed"
+                      className="w-full px-3 py-2 sketch-border-sm text-[12px] bg-white focus:outline-none focus:border-[#e11d48] leading-relaxed"
                     />
 
                     <input
@@ -977,7 +989,7 @@ export default function ResumeBuilder() {
                           },
                         }));
                       }}
-                      className="w-full px-3 py-1.5 text-[11px] rounded-xl border-2 border-[#18181b] bg-white font-mono focus:outline-none focus:border-[#e11d48]"
+                      className="w-full px-3 py-1.5 text-[11px] sketch-border-sm bg-white font-mono focus:outline-none focus:border-[#e11d48]"
                     />
                   </div>
                 ))}
@@ -1013,7 +1025,7 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="flex-1 px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white font-medium focus:outline-none focus:border-[#e11d48]"
+                        className="flex-1 px-3 py-2 sketch-border-sm text-[12px] bg-white font-medium focus:outline-none focus:border-[#e11d48]"
                       />
                       <input
                         value={c.issuer}
@@ -1030,7 +1042,7 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="w-1/3 px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
+                        className="w-1/3 px-3 py-2 sketch-border-sm text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
                       />
                     </div>
                   ))}
@@ -1065,10 +1077,10 @@ export default function ResumeBuilder() {
                             metadata: { ...resume.metadata, template: tpl.id as 'modern' | 'classic' | 'minimal' | 'executive' },
                           })
                         }
-                        className={`p-3 rounded-xl border-2 text-left text-[12px] font-bold transition-all cursor-pointer ${
+                        className={`p-3 sketch-border-sm text-left text-[12px] font-bold transition-all cursor-pointer ${
                           resume.metadata.template === tpl.id
-                            ? 'border-[#18181b] bg-[#ffe4e6] text-[#e11d48] shadow-[3px_3px_0px_#18181b]'
-                            : 'border-[#18181b] bg-white text-[#18181b] shadow-[1px_1px_0px_#18181b] hover:shadow-[3px_3px_0px_#18181b]'
+                            ? 'bg-[#ffe4e6] text-[#e11d48]'
+                            : 'bg-white text-[#18181b] hover:bg-[#faf8f5]'
                         }`}
                       >
                         {tpl.name}
@@ -1105,23 +1117,14 @@ export default function ResumeBuilder() {
 
         {/* =========================================================
             RIGHT COLUMN: REAL-TIME A4 LIVE RESUME PREVIEW
+            Styled with organic hand-drawn sketch-border like Image 1
+            Aligned horizontally at the EXACT SAME LEVEL as Left Editor
         ========================================================= */}
-        <div className="lg:col-span-7 flex flex-col items-center">
-          {/* Top Preview Controls / Badge */}
-          <div className="no-print w-full max-w-[820px] flex items-center justify-between pb-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white sketch-border-sm text-[12px] font-bold text-[#141416]">
-              <Flame className="w-3.5 h-3.5 text-[#e11d48]" />
-              <span>Campus Placement Simulator · Reactive Resume Engine</span>
-            </div>
-            <span className="hidden sm:inline font-hand text-[15px] text-[#e11d48] font-bold transform -rotate-1">
-              ✨ Real-Time ATS Rendered Preview
-            </span>
-          </div>
-
-          {/* Printable A4 Container */}
+        <div className="lg:col-span-7 flex justify-center">
+          {/* Printable A4 Container with organic hand-drawn sketch-border */}
           <div
             id="resume-printable"
-            className="w-full max-w-[820px] bg-white rounded-2xl border-2 border-[#18181b] shadow-[6px_6px_0px_#18181b] p-8 sm:p-12 transition-all text-[#1d1d1f]"
+            className="w-full max-w-[820px] bg-white sketch-border p-8 sm:p-12 transition-all text-[#1d1d1f]"
             style={{ minHeight: '1050px' }}
           >
             {/* 1. Header & Contact Details */}
