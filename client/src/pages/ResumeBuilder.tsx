@@ -395,10 +395,10 @@ export default function ResumeBuilder() {
         ========================================================= */}
         <div
           className="no-print lg:col-span-5 bg-white sketch-border flex flex-col h-[calc(100vh-135px)] lg:sticky lg:top-[85px] overflow-hidden"
-          style={{ borderRadius: '255px 25px 225px 25px/25px 225px 25px 255px' }}
+          style={{ borderRadius: '20px 20px 225px 15px / 20px 20px 15px 255px' }}
         >
-          {/* Section Navigation Tabs with comfortable top & side padding */}
-          <div className="border-b-2 border-[#18181b] pt-4 pb-3 px-4 flex overflow-x-auto gap-2 bg-[#faf8f5] items-center">
+          {/* Section Navigation Tabs with raised corners and ample headroom */}
+          <div className="border-b-2 border-[#18181b] pt-3.5 pb-2.5 px-4 flex overflow-x-auto gap-2 bg-[#faf8f5] items-center">
             {[
               { id: 'basics', label: 'Basics', icon: User },
               { id: 'experience', label: 'Experience', icon: Briefcase },
