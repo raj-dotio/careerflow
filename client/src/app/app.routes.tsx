@@ -2,6 +2,7 @@ import { createBrowserRouter, useRouteError, Link } from 'react-router-dom';
 import Home from '../pages/Home';
 import ResumeBuilder from '../pages/ResumeBuilder';
 import AtsChecker from '../pages/AtsChecker';
+import RoadmapPage from '../pages/RoadmapPage';
 
 function RouteErrorBoundary() {
   const error = useRouteError() as { message?: string };
@@ -49,6 +50,11 @@ export const router = createBrowserRouter([
   {
     path: '/ats',
     element: <AtsChecker />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: '/roadmap',
+    element: <RoadmapPage />,
     errorElement: <RouteErrorBoundary />,
   },
 ]);

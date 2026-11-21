@@ -4,6 +4,13 @@ export interface IUser extends Document {
   name: string;
   email: string;
   credits: number;
+  streakCount?: number;
+  lastActiveOn?: Date;
+  academicYear?: string;
+  experienceLevel?: string;
+  interests?: string[];
+  weeklyTargetHours?: number;
+  roleTitle?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -22,6 +29,31 @@ const userSchema = new Schema<IUser>(
     credits: {
       type: Number,
       default: 1000,
+    },
+    streakCount: {
+      type: Number,
+      default: 0,
+    },
+    lastActiveOn: {
+      type: Date,
+    },
+    academicYear: {
+      type: String,
+    },
+    experienceLevel: {
+      type: String,
+      default: 'beginner',
+    },
+    interests: {
+      type: [String],
+      default: [],
+    },
+    weeklyTargetHours: {
+      type: Number,
+      default: 8,
+    },
+    roleTitle: {
+      type: String,
     },
   },
   {
