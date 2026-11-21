@@ -345,6 +345,13 @@ export default function Home() {
               <Sparkles className="w-4 h-4 text-[#e11d48]" />
               <span>ATS Diagnostics</span>
             </Link>
+            <Link
+              to="/goals"
+              className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap font-bold"
+            >
+              <Flame className="w-4 h-4 text-[#e11d48]" />
+              <span>Daily Streaks</span>
+            </Link>
             <a
               href="#ai-chamber"
               className="flex items-center gap-2 text-[#e11d48] hover:text-[#be123c] transition-colors whitespace-nowrap font-bold"
@@ -425,16 +432,24 @@ export default function Home() {
           {/* Main Action Sketched Red Button with Icon Logo */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link
-              to="/builder"
-              className="sketch-btn-red px-7 py-3.5 text-[17px] flex items-center gap-2.5 cursor-pointer"
+              to="/goals"
+              className="sketch-btn-red px-7 py-3.5 text-[17px] flex items-center gap-2.5 cursor-pointer shadow-md hover:scale-102 transition-transform"
             >
-              <FileText className="w-5 h-5 text-white" />
-              <span>Open Reactive Resume Builder</span>
+              <Flame className="w-5 h-5 fill-white text-white animate-bounce" />
+              <span>Daily Streak &amp; Goals Matrix</span>
+            </Link>
+
+            <Link
+              to="/builder"
+              className="sketch-btn-white px-6 py-3.5 text-[16px] flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors"
+            >
+              <FileText className="w-4 h-4 text-[#e11d48]" />
+              <span>Reactive Resume Builder</span>
             </Link>
 
             <Link
               to="/ats"
-              className="sketch-btn-white px-6 py-3.5 text-[16px] flex items-center gap-2 cursor-pointer"
+              className="sketch-btn-white px-6 py-3.5 text-[16px] flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors"
             >
               <Sparkles className="w-4 h-4 text-[#e11d48]" />
               <span>Run Live ATS Checker</span>

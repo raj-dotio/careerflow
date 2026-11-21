@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import authRoute from './routes/authRoute.js';
 import resumeRoute from './routes/resumeRoute.js';
 import atsRoute from './routes/atsRoute.js';
+import goalRoute from './routes/goalRoute.js';
 
 const app: Application = express();
 
@@ -36,6 +37,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
 app.use('/api/auth', authRoute);
 app.use('/api/resumes', resumeRoute);
 app.use('/api/ats', atsRoute);
+app.use('/api/goals', goalRoute);
 
 // 404 Not Found Handler
 app.use((req: Request, res: Response) => {
