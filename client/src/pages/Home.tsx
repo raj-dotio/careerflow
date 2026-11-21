@@ -17,7 +17,6 @@ import {
   Flame,
   CheckCircle2,
   Send,
-  BookOpen,
   Bot,
   MessageSquare,
 } from 'lucide-react';
@@ -360,13 +359,6 @@ export default function Home() {
               <span>AI Mock Chamber</span>
             </a>
             <a
-              href="#journey"
-              className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
-            >
-              <BookOpen className="w-4 h-4 text-[#71717a]" />
-              <span>Milestones</span>
-            </a>
-            <a
               href="#student-quiz"
               className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
             >
@@ -374,25 +366,6 @@ export default function Home() {
               <span>Quick Challenge</span>
             </a>
           </nav>
-
-          {/* Right Action Buttons */}
-          <div className="flex items-center gap-3 shrink-0">
-            <button
-              onClick={handleTossCaps}
-              className="hidden lg:flex items-center gap-1.5 px-3.5 py-1.5 bg-white text-[#141416] sketch-border-sm text-[12px] font-bold hover:bg-[#f4f4f5] active:scale-95 transition-all whitespace-nowrap cursor-pointer"
-              title="Click to celebrate and toss graduation hats!"
-            >
-              <GraduationCap className="w-3.5 h-3.5 text-[#e11d48]" />
-              <span className="whitespace-nowrap">Toss Scholar Hat</span>
-            </button>
-            <a
-              href="#simulation"
-              className="flex items-center gap-2 px-4 py-2 bg-white text-[#141416] sketch-border-sm text-[12px] font-bold hover:bg-[#f4f4f5] transition-all whitespace-nowrap shadow-xs"
-            >
-              <span className="w-2 h-2 rounded-full bg-[#e11d48] animate-ping shrink-0" />
-              <span className="whitespace-nowrap">Join Placement Cohort</span>
-            </a>
-          </div>
         </div>
 
         {/* THE RED THREAD OF PLACEMENT FATE (Wavy Line from Reference Images 1 & 4) */}
