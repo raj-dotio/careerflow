@@ -19,6 +19,7 @@ import {
   Send,
   Bot,
   MessageSquare,
+  Compass,
 } from 'lucide-react';
 
 import femaleAiVideo from '../assets/videos/female-ai.mp4';
@@ -331,6 +332,13 @@ export default function Home() {
           {/* Central Navigation - Centered */}
           <nav className="hidden md:flex items-center justify-center gap-6 lg:gap-8 text-[13.5px] lg:text-[14px] font-semibold text-[#3f3f46] mx-auto">
             <Link
+              to="/roadmap"
+              className="flex items-center gap-2 text-[#e11d48] hover:text-[#be123c] transition-colors whitespace-nowrap font-bold"
+            >
+              <Compass className="w-4 h-4 text-[#e11d48]" />
+              <span>Learning Roadmap</span>
+            </Link>
+            <Link
               to="/builder"
               className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
             >
@@ -341,7 +349,7 @@ export default function Home() {
               to="/ats"
               className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
             >
-              <Sparkles className="w-4 h-4 text-[#e11d48]" />
+              <Sparkles className="w-4 h-4 text-[#71717a]" />
               <span>ATS Diagnostics</span>
             </Link>
             <Link
@@ -418,6 +426,14 @@ export default function Home() {
             </Link>
 
             <Link
+              to="/roadmap"
+              className="sketch-btn-white px-6 py-3.5 text-[16px] flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors"
+            >
+              <Compass className="w-4 h-4 text-[#e11d48]" />
+              <span>Personalized Learning Roadmap</span>
+            </Link>
+
+            <Link
               to="/builder"
               className="sketch-btn-white px-6 py-3.5 text-[16px] flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors"
             >
@@ -430,7 +446,7 @@ export default function Home() {
               className="sketch-btn-white px-6 py-3.5 text-[16px] flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors"
             >
               <Sparkles className="w-4 h-4 text-[#e11d48]" />
-              <span>Run Live ATS Checker</span>
+              <span>ATS Diagnostics</span>
               <ChevronRight className="w-4 h-4 text-[#e11d48]" />
             </Link>
 

@@ -7,6 +7,7 @@ import DailyGoals from '../pages/DailyGoals';
 import MockChamberLanding from '../pages/MockChamberLanding';
 import MockChamberRoom from '../pages/MockChamberRoom';
 import MockChamberReport from '../pages/MockChamberReport';
+import RoadmapPage from '../pages/RoadmapPage';
 
 export const router = createBrowserRouter([
   {
@@ -52,6 +53,11 @@ export const router = createBrowserRouter([
   {
     path: '/mock-chamber/report/:id',
     element: <MockChamberReport />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: '/roadmap',
+    element: <RoadmapPage />,
     errorElement: <RouteErrorBoundary />,
   },
 ]);

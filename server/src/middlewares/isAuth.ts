@@ -57,7 +57,7 @@ export const optionalAuth = async (
     }
     next();
   } catch {
-    // proceed without userId on token error
+    // Ignore invalid token for optional auth
     next();
   }
 };

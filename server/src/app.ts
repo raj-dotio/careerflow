@@ -7,6 +7,7 @@ import resumeRoute from './routes/resumeRoute.js';
 import atsRoute from './routes/atsRoute.js';
 import interviewRoute from './routes/interview.routes.js';
 import goalRoute from './routes/goalRoute.js';
+import roadmapRoute from './routes/roadmapRoute.js';
 
 const app: Application = express();
 
@@ -40,6 +41,7 @@ app.use('/api/resumes', resumeRoute);
 app.use('/api/ats', atsRoute);
 app.use('/api/mock-interview', interviewRoute);
 app.use('/api/goals', goalRoute);
+app.use('/api/roadmap', roadmapRoute);
 
 // 404 Not Found Handler
 app.use((req: Request, res: Response) => {
