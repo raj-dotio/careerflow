@@ -28,104 +28,13 @@ export function diffInDays(a: Date, b: Date): number {
   return Math.round((utcA - utcB) / msPerDay);
 }
 
-// Initial seed data generator for realistic student habit tracking
-async function seedStarterGoals(userId: string): Promise<void> {
-  const today = new Date();
-  const todayStr = formatDate(today);
-
-  const starterTemplates = [
-    {
-      userId,
-      title: 'Solve 2 DSA problems',
-      description: 'Daily LeetCode / Striver SDE Sheet practice',
-      category: 'dsa' as const,
-      targetValue: 2,
-      currentValue: 1,
-      unit: 'problems',
-      color: '#2563eb', // Blue matching reference
-      frequency: 'daily' as const,
-      completed: false,
-    },
-    {
-      userId,
-      title: 'Spend 60 mins on Full-Stack Project',
-      description: 'Feature building, commits & code reviews',
-      category: 'project' as const,
-      targetValue: 60,
-      currentValue: 60,
-      unit: 'mins',
-      color: '#10b981', // Emerald matching reference
-      frequency: 'daily' as const,
-      completed: true,
-    },
-    {
-      userId,
-      title: 'Read 20 pages Tech Book / Docs',
-      description: 'System design, React 19 architecture or Cloud docs',
-      category: 'reading' as const,
-      targetValue: 20,
-      currentValue: 15,
-      unit: 'pages',
-      color: '#e11d48', // Vermilion sketch accent
-      frequency: 'daily' as const,
-      completed: false,
-    },
-  ];
-
-  for (const tpl of starterTemplates) {
-    const goal = await Goal.create(tpl);
-
-    // Seed past 75 days of progress history with realistic consistency (75-90%)
-    const progressRecords = [];
-    for (let i = 75; i >= 1; i--) {
-      const pastDate = addDays(today, -i);
-      const dateStr = formatDate(pastDate);
-
-      const dayOfWeek = pastDate.getDay();
-      const chance = dayOfWeek === 0 ? 0.65 : dayOfWeek === 6 ? 0.75 : 0.88;
-      const isCompleted = Math.random() < chance;
-      const val = isCompleted ? tpl.targetValue : Math.floor(tpl.targetValue * (Math.random() * 0.7));
-
-      progressRecords.push({
-        userId,
-        goalId: goal._id.toString(),
-        date: dateStr,
-        value: val,
-        targetValue: tpl.targetValue,
-        completed: isCompleted,
-      });
-    }
-
-    // Add today's record
-    progressRecords.push({
-      userId,
-      goalId: goal._id.toString(),
-      date: todayStr,
-      value: tpl.currentValue,
-      targetValue: tpl.targetValue,
-      completed: tpl.completed,
-    });
-
-    try {
-      await GoalProgress.insertMany(progressRecords, { ordered: false });
-    } catch {
-      // Ignore duplicates if any
-    }
-  }
-}
-
 // 1. GET /api/goals - Fetch all goals for user
 export const getGoals = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = (req as AuthRequest).userId || (req.query.userId as string) || 'guest';
     const todayStr = formatDate(new Date());
 
-    let goals = await Goal.find({ userId }).sort({ createdAt: -1 });
-
-    if (goals.length === 0) {
-      await seedStarterGoals(userId);
-      goals = await Goal.find({ userId }).sort({ createdAt: -1 });
-    }
+    const goals = await Goal.find({ userId }).sort({ createdAt: -1 });
 
     // Sync today's completion status from GoalProgress
     const todayProgress = await GoalProgress.find({
@@ -350,11 +259,7 @@ export const getGoalStats = async (req: Request, res: Response): Promise<void> =
     const yesterdayStr = formatDate(addDays(today, -1));
 
     // Fetch user goals
-    let goals = await Goal.find({ userId });
-    if (goals.length === 0) {
-      await seedStarterGoals(userId);
-      goals = await Goal.find({ userId });
-    }
+    const goals = await Goal.find({ userId });
 
     // Fetch all user progress records
     const allProgress = await GoalProgress.find({ userId });

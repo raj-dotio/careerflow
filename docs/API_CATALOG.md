@@ -22,7 +22,7 @@
 | `POST` | `/api/resumes/:id/duplicate` | Duplicate an existing resume | Optional / Guest | `server/src/controllers/resumeController.ts` |
 | `POST` | `/api/ats/analyze` | Evaluate raw text or JSON resume against ATS | None | `server/src/controllers/atsController.ts` |
 | `POST` | `/api/ats/upload` | Upload resume file (PDF/DOCX/TXT) for ATS analysis | None | `server/src/controllers/atsController.ts` |
-| `GET` | `/api/goals` | Fetch all user daily goals (auto-seeds defaults) | Optional / Guest | `server/src/controllers/goalController.ts` |
+| `GET` | `/api/goals` | Fetch all user daily goals | Optional / Guest | `server/src/controllers/goalController.ts` |
 | `GET` | `/api/goals/stats` | Streaks, 26-wk heatmap, weekly & per-goal analytics | Optional / Guest | `server/src/controllers/goalController.ts` |
 | `POST` | `/api/goals` | Create a new daily target | Optional / Guest | `server/src/controllers/goalController.ts` |
 | `PUT` | `/api/goals/:id` | Update target properties | Optional / Guest | `server/src/controllers/goalController.ts` |
@@ -288,7 +288,7 @@
 ## 5. Daily Goals & Streak Analytics
 
 ### `GET /api/goals`
-- **Purpose**: Fetch all daily targets for a user; automatically seeds 3 starter goals with 75-day realistic history if empty.
+- **Purpose**: Fetch all daily targets for a user.
 - **Auth**: Optional / Guest (`req.userId || req.query.userId || 'guest'`).
 - **Query Parameters**: `userId?: string`
 - **Response `200 OK`**:

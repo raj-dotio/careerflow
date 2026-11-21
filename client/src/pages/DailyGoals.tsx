@@ -22,14 +22,6 @@ import {
   HelpCircle,
   Zap,
 } from 'lucide-react';
-import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-} from 'recharts';
 
 export interface GoalItem {
   _id: string;
@@ -61,19 +53,6 @@ export interface HeatmapCell {
   level: 0 | 1 | 2 | 3 | 4;
 }
 
-export interface PerGoalStat {
-  goalId: string;
-  title: string;
-  color: string;
-  category: string;
-  currentStreak: number;
-  bestStreak: number;
-  last30DaysPercent: number;
-  totalCheckOffs: number;
-  heatmap: Array<{ date: string; completed: boolean }>;
-  consistencyData: Array<{ week: string; percentage: number }>;
-}
-
 export interface StatsResponse {
   today: string;
   currentStreak: number;
@@ -88,179 +67,130 @@ export interface StatsResponse {
     breakdown: DayBreakdown[];
   };
   heatmap: HeatmapCell[];
-  perGoalStats: PerGoalStat[];
 }
 
-// Default initial starter goals so the page is instant & rich
-const initialStarterGoals: GoalItem[] = [
-  {
-    _id: 'goal_dsa_default',
-    title: 'Solve 2 DSA problems',
-    description: 'Daily LeetCode / Striver SDE Sheet practice',
-    category: 'dsa',
-    targetValue: 2,
-    currentValue: 1,
-    unit: 'problems',
-    color: '#2563eb',
-    frequency: 'daily',
-    completed: false,
-  },
-  {
-    _id: 'goal_project_default',
-    title: 'Spend 60 mins on Full-Stack Project',
-    description: 'Feature building, commits & code reviews',
-    category: 'project',
-    targetValue: 60,
-    currentValue: 60,
-    unit: 'mins',
-    color: '#10b981',
-    frequency: 'daily',
-    completed: true,
-  },
-  {
-    _id: 'goal_reading_default',
-    title: 'Read 20 pages Tech Book / Docs',
-    description: 'System design, React 19 architecture or Cloud docs',
-    category: 'reading',
-    targetValue: 20,
-    currentValue: 15,
-    unit: 'pages',
-    color: '#e11d48',
-    frequency: 'daily',
-    completed: false,
-  },
-];
-
-// Helper to generate initial client stats if offline/starting fresh
-function generateInitialClientStats(items: GoalItem[]): StatsResponse {
+function getTodayString(): string {
   const today = new Date();
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, '0');
   const day = String(today.getDate()).padStart(2, '0');
-  const todayStr = `${year}-${month}-${day}`;
-
-  const heatmap: HeatmapCell[] = [];
-  for (let i = 181; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
-    const dY = d.getFullYear();
-    const dM = String(d.getMonth() + 1).padStart(2, '0');
-    const dD = String(d.getDate()).padStart(2, '0');
-    const dStr = `${dY}-${dM}-${dD}`;
-
-    const isToday = dStr === todayStr;
-    const completedCount = isToday ? items.filter((g) => g.completed).length : Math.random() > 0.3 ? 2 : 1;
-    const level = completedCount >= 2 ? 4 : completedCount === 1 ? 2 : 0;
-    heatmap.push({
-      date: dStr,
-      completedCount,
-      totalGoals: items.length || 3,
-      level,
-    });
-  }
-
-  const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const breakdown: DayBreakdown[] = weekDays.map((wDay, idx) => {
-    const isToday = idx === (today.getDay() === 0 ? 6 : today.getDay() - 1);
-    const isPast = idx < (today.getDay() === 0 ? 6 : today.getDay() - 1);
-    const isFuture = idx > (today.getDay() === 0 ? 6 : today.getDay() - 1);
-    const completed = isToday ? items.filter((g) => g.completed).length : isPast ? 2 : 0;
-    return {
-      day: wDay,
-      date: todayStr,
-      completed,
-      total: items.length || 3,
-      percentage: Math.min(100, Math.round((completed / (items.length || 3)) * 100)),
-      isToday,
-      isFuture,
-    };
-  });
-
-  const perGoalStats: PerGoalStat[] = items.map((goal, idx) => {
-    const baseStreak = idx === 0 ? 19 : idx === 1 ? 24 : 12;
-    const gHeatmap = [];
-    for (let i = 139; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      const dY = d.getFullYear();
-      const dM = String(d.getMonth() + 1).padStart(2, '0');
-      const dD = String(d.getDate()).padStart(2, '0');
-      const dStr = `${dY}-${dM}-${dD}`;
-      const isToday = dStr === todayStr;
-      gHeatmap.push({
-        date: dStr,
-        completed: isToday ? goal.completed : Math.random() > 0.22,
-      });
-    }
-
-    const consistencyData = [
-      { week: 'Apr 27', percentage: 70 },
-      { week: 'May 11', percentage: 85 },
-      { week: 'May 25', percentage: 80 },
-      { week: 'Jun 8', percentage: 65 },
-      { week: 'Jun 22', percentage: 95 },
-      { week: 'Jul 6', percentage: 100 },
-    ];
-
-    return {
-      goalId: goal._id,
-      title: goal.title,
-      color: goal.color,
-      category: goal.category,
-      currentStreak: goal.completed ? baseStreak + 1 : baseStreak,
-      bestStreak: baseStreak + 6,
-      last30DaysPercent: 88,
-      totalCheckOffs: 140 + idx * 30,
-      heatmap: gHeatmap,
-      consistencyData,
-    };
-  });
-
-  return {
-    today: todayStr,
-    currentStreak: items.some((g) => g.completed) ? 20 : 19,
-    bestStreak: 28,
-    todayCompletedCount: items.filter((g) => g.completed).length,
-    totalActiveGoals: items.length,
-    weeklySummary: {
-      planned: items.length * 7,
-      completed: 14 + items.filter((g) => g.completed).length,
-      missed: 2,
-      completionRate: 85,
-      breakdown,
-    },
-    heatmap,
-    perGoalStats,
-  };
+  return `${year}-${month}-${day}`;
 }
 
 export default function DailyGoals() {
-  // 1. Initial State from localStorage (0ms latency, always persists)
+  const todayStr = useMemo(() => getTodayString(), []);
+
+  // 1. Initial State: load only real user goals (filter out any legacy dummy starter items)
   const [goals, setGoals] = useState<GoalItem[]>(() => {
     const saved = localStorage.getItem('careerflow_daily_goals');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) {
+          // Remove old dummy seed templates
+          const realGoals = parsed.filter(
+            (g: GoalItem) =>
+              g._id &&
+              !g._id.includes('_default') &&
+              g.title !== 'Solve 2 DSA problems' &&
+              g.title !== 'Spend 60 mins on Full-Stack Project' &&
+              g.title !== 'Read 20 pages Tech Book / Docs'
+          );
+          return realGoals;
+        }
       } catch {
         // ignore error
       }
     }
-    return initialStarterGoals;
+    return [];
   });
 
-  const [stats, setStats] = useState<StatsResponse | null>(() => {
-    const saved = localStorage.getItem('careerflow_daily_stats');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed && parsed.currentStreak !== undefined) return parsed;
-      } catch {
-        // ignore error
+  const [serverStats, setServerStats] = useState<StatsResponse | null>(null);
+
+  const stats = useMemo<StatsResponse>(() => {
+    const totalGoals = goals.length;
+    const completedToday = goals.filter((g) => g.completed).length;
+    const todayDate = new Date();
+    const todayDayIndex = todayDate.getDay() === 0 ? 6 : todayDate.getDay() - 1;
+    const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+    // 182-day clean heatmap
+    const baseHeatmap =
+      serverStats?.heatmap && serverStats.heatmap.length === 182
+        ? serverStats.heatmap
+        : Array.from({ length: 182 }, (_, i) => {
+            const d = new Date(todayDate);
+            d.setDate(d.getDate() - (181 - i));
+            const dY = d.getFullYear();
+            const dM = String(d.getMonth() + 1).padStart(2, '0');
+            const dD = String(d.getDate()).padStart(2, '0');
+            return {
+              date: `${dY}-${dM}-${dD}`,
+              completedCount: 0,
+              totalGoals: 0,
+              level: 0 as const,
+            };
+          });
+
+    const heatmap = baseHeatmap.map((cell, idx) => {
+      if (idx === baseHeatmap.length - 1) {
+        const ratio = totalGoals > 0 ? completedToday / totalGoals : 0;
+        const level: 0 | 1 | 2 | 3 | 4 =
+          ratio >= 0.8 ? 4 : ratio >= 0.5 ? 3 : ratio >= 0.25 ? 2 : completedToday > 0 ? 1 : 0;
+        return {
+          ...cell,
+          completedCount: completedToday,
+          totalGoals,
+          level,
+        };
       }
-    }
-    return generateInitialClientStats(initialStarterGoals);
-  });
+      return cell;
+    });
+
+    const breakdown = weekDays.map((wDay, idx) => {
+      const isToday = idx === todayDayIndex;
+      const isFuture = idx > todayDayIndex;
+      const done = isToday ? completedToday : 0;
+      const planned = isToday ? totalGoals : isFuture ? totalGoals : 0;
+      const pct = planned > 0 ? Math.min(100, Math.round((done / planned) * 100)) : 0;
+      return {
+        day: wDay,
+        date: todayStr,
+        completed: done,
+        total: planned,
+        percentage: pct,
+        isToday,
+        isFuture,
+      };
+    });
+
+    const currentStreak =
+      completedToday > 0
+        ? Math.max(1, serverStats?.currentStreak || 1)
+        : serverStats?.currentStreak || 0;
+    const bestStreak = Math.max(
+      currentStreak,
+      serverStats?.bestStreak || (completedToday > 0 ? 1 : 0)
+    );
+    const completionRate =
+      totalGoals > 0 ? Math.min(100, Math.round((completedToday / totalGoals) * 100)) : 0;
+
+    return {
+      today: todayStr,
+      currentStreak,
+      bestStreak,
+      todayCompletedCount: completedToday,
+      totalActiveGoals: totalGoals,
+      weeklySummary: {
+        planned: totalGoals * 7,
+        completed: completedToday,
+        missed: 0,
+        completionRate,
+        breakdown,
+      },
+      heatmap,
+    };
+  }, [goals, serverStats, todayStr]);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedHeatmapCell, setSelectedHeatmapCell] = useState<{
@@ -279,23 +209,14 @@ export default function DailyGoals() {
   const [formTitle, setFormTitle] = useState('');
   const [formDescription, setFormDescription] = useState('');
   const [formCategory, setFormCategory] = useState<'dsa' | 'project' | 'interview' | 'reading' | 'custom'>('dsa');
-  const [formTarget, setFormTarget] = useState<number>(2);
-  const [formUnit, setFormUnit] = useState('problems');
+  const [formTarget, setFormTarget] = useState<number>(1);
+  const [formUnit, setFormUnit] = useState('tasks');
   const [formColor, setFormColor] = useState('#2563eb');
 
-  // Chart range filter state per goal (12 weeks vs 6 months)
-  const [chartRanges, setChartRanges] = useState<{ [goalId: string]: '12weeks' | '6months' }>({});
-
-  // Auto-save goals & stats to localStorage whenever they change
+  // Auto-save goals to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('careerflow_daily_goals', JSON.stringify(goals));
   }, [goals]);
-
-  useEffect(() => {
-    if (stats) {
-      localStorage.setItem('careerflow_daily_stats', JSON.stringify(stats));
-    }
-  }, [stats]);
 
   // Sync with backend API
   const refreshGoalsAndStats = useCallback(async () => {
@@ -308,7 +229,7 @@ export default function DailyGoals() {
 
       if (goalsRes.ok) {
         const gData = await goalsRes.json();
-        if (gData.success && gData.goals && gData.goals.length > 0) {
+        if (gData.success && Array.isArray(gData.goals)) {
           setGoals(gData.goals);
         }
       }
@@ -316,11 +237,11 @@ export default function DailyGoals() {
       if (statsRes.ok) {
         const sData = await statsRes.json();
         if (sData.success && sData.stats) {
-          setStats(sData.stats);
+          setServerStats(sData.stats);
         }
       }
     } catch {
-      // Backend might be offline; local state & localStorage keep working smoothly!
+      // Backend offline: local state handles everything
     } finally {
       setLoading(false);
     }
@@ -337,18 +258,18 @@ export default function DailyGoals() {
         if (!isMounted) return;
         if (goalsRes.ok) {
           const gData = await goalsRes.json();
-          if (gData.success && gData.goals && gData.goals.length > 0) {
+          if (gData.success && Array.isArray(gData.goals)) {
             setGoals(gData.goals);
           }
         }
         if (statsRes.ok) {
           const sData = await statsRes.json();
           if (sData.success && sData.stats) {
-            setStats(sData.stats);
+            setServerStats(sData.stats);
           }
         }
       } catch {
-        // Backend offline fallback handled gracefully
+        // Backend offline fallback handled cleanly
       }
     };
     load();
@@ -357,88 +278,12 @@ export default function DailyGoals() {
     };
   }, []);
 
-  // Helper to re-derive optimistic stats when goals progress changes
-  const applyOptimisticProgressUpdate = (updatedGoals: GoalItem[], goalId: string, isNewlyDone: boolean) => {
-    if (isNewlyDone) {
-      setStreakToast('🔥 Target Checked Off! Daily streak compounded (+1 Day)!');
-      setTimeout(() => setStreakToast(null), 4500);
-    }
-
-    setStats((prev) => {
-      if (!prev) return generateInitialClientStats(updatedGoals);
-      const completedCount = updatedGoals.filter((g) => g.completed).length;
-      const totalGoals = updatedGoals.length;
-      const isStreakActive = completedCount > 0;
-
-      // Update per-goal stats list
-      const nextPerGoalStats = prev.perGoalStats.map((pStat) => {
-        if (pStat.goalId === goalId) {
-          const goalObj = updatedGoals.find((g) => g._id === goalId);
-          const isDone = goalObj?.completed ?? false;
-          const updatedHeatmap = pStat.heatmap.map((h, i) =>
-            i === pStat.heatmap.length - 1 ? { ...h, completed: isDone } : h
-          );
-          return {
-            ...pStat,
-            currentStreak: isDone ? pStat.currentStreak + 1 : Math.max(0, pStat.currentStreak - 1),
-            totalCheckOffs: isDone ? pStat.totalCheckOffs + 1 : pStat.totalCheckOffs,
-            heatmap: updatedHeatmap,
-          };
-        }
-        return pStat;
-      });
-
-      // Update today's heatmap cell
-      const nextHeatmap = prev.heatmap.map((cell, idx) => {
-        if (idx === prev.heatmap.length - 1) {
-          const ratio = completedCount / Math.max(1, totalGoals);
-          const level: 0 | 1 | 2 | 3 | 4 =
-            ratio >= 0.8 ? 4 : ratio >= 0.5 ? 3 : ratio >= 0.25 ? 2 : completedCount > 0 ? 1 : 0;
-          return {
-            ...cell,
-            completedCount,
-            totalGoals,
-            level,
-          };
-        }
-        return cell;
-      });
-
-      // Update weekly breakdown
-      const nextBreakdown = prev.weeklySummary.breakdown.map((b) => {
-        if (b.isToday) {
-          return {
-            ...b,
-            completed: completedCount,
-            total: totalGoals,
-            percentage: Math.min(100, Math.round((completedCount / Math.max(1, totalGoals)) * 100)),
-          };
-        }
-        return b;
-      });
-
-      return {
-        ...prev,
-        currentStreak: isStreakActive ? (prev.currentStreak || 19) + (isNewlyDone ? 1 : 0) : prev.currentStreak,
-        todayCompletedCount: completedCount,
-        totalActiveGoals: totalGoals,
-        weeklySummary: {
-          ...prev.weeklySummary,
-          breakdown: nextBreakdown,
-        },
-        heatmap: nextHeatmap,
-        perGoalStats: nextPerGoalStats,
-      };
-    });
-  };
-
   // Adjust numeric progress
   const handleProgressDelta = async (goalId: string, delta: number) => {
     let isNewlyDone = false;
-    let nextGoals: GoalItem[] = [];
 
-    setGoals((prev) => {
-      nextGoals = prev.map((g) => {
+    setGoals((prev) =>
+      prev.map((g) => {
         if (g._id === goalId) {
           const newVal = Math.max(0, g.currentValue + delta);
           const wasCompleted = g.completed;
@@ -453,11 +298,13 @@ export default function DailyGoals() {
           };
         }
         return g;
-      });
-      return nextGoals;
-    });
+      })
+    );
 
-    applyOptimisticProgressUpdate(nextGoals, goalId, isNewlyDone);
+    if (isNewlyDone) {
+      setStreakToast('🔥 Target Checked Off! Streak updated (+1 Day)!');
+      setTimeout(() => setStreakToast(null), 4000);
+    }
 
     try {
       await fetch(`/api/goals/${goalId}/progress`, {
@@ -465,13 +312,8 @@ export default function DailyGoals() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ delta }),
       });
-      const statsRes = await fetch('/api/goals/stats');
-      if (statsRes.ok) {
-        const sData = await statsRes.json();
-        if (sData.stats) setStats(sData.stats);
-      }
     } catch {
-      // Offline fallback already updated in state and localStorage!
+      // Stays in state & localStorage
     }
   };
 
@@ -479,16 +321,17 @@ export default function DailyGoals() {
   const handleToggleCompleted = async (goal: GoalItem) => {
     const nextCompleted = !goal.completed;
     const nextValue = nextCompleted ? goal.targetValue : Math.max(0, goal.targetValue - 1);
-    let nextGoals: GoalItem[] = [];
 
-    setGoals((prev) => {
-      nextGoals = prev.map((g) =>
+    setGoals((prev) =>
+      prev.map((g) =>
         g._id === goal._id ? { ...g, completed: nextCompleted, currentValue: nextValue } : g
-      );
-      return nextGoals;
-    });
+      )
+    );
 
-    applyOptimisticProgressUpdate(nextGoals, goal._id, nextCompleted);
+    if (nextCompleted) {
+      setStreakToast('🔥 Target Checked Off! Streak updated (+1 Day)!');
+      setTimeout(() => setStreakToast(null), 4000);
+    }
 
     try {
       await fetch(`/api/goals/${goal._id}/progress`, {
@@ -499,13 +342,8 @@ export default function DailyGoals() {
           value: nextValue,
         }),
       });
-      const statsRes = await fetch('/api/goals/stats');
-      if (statsRes.ok) {
-        const sData = await statsRes.json();
-        if (sData.stats) setStats(sData.stats);
-      }
     } catch {
-      // Offline fallback active
+      // Stays in state & localStorage
     }
   };
 
@@ -515,8 +353,8 @@ export default function DailyGoals() {
     setFormTitle('');
     setFormDescription('');
     setFormCategory('dsa');
-    setFormTarget(2);
-    setFormUnit('problems');
+    setFormTarget(1);
+    setFormUnit('tasks');
     setFormColor('#2563eb');
     setIsModalOpen(true);
   };
@@ -544,7 +382,6 @@ export default function DailyGoals() {
     const trimmedUnit = formUnit.trim() || 'tasks';
 
     if (editingGoal) {
-      // Optimistic edit
       setGoals((prev) =>
         prev.map((g) =>
           g._id === editingGoal._id
@@ -562,19 +399,6 @@ export default function DailyGoals() {
         )
       );
 
-      // Also update perGoalStats title & color immediately
-      setStats((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          perGoalStats: prev.perGoalStats.map((p) =>
-            p.goalId === editingGoal._id
-              ? { ...p, title: trimmedTitle, color: formColor, category: formCategory }
-              : p
-          ),
-        };
-      });
-
       setIsModalOpen(false);
 
       try {
@@ -590,12 +414,10 @@ export default function DailyGoals() {
             color: formColor,
           }),
         });
-        refreshGoalsAndStats();
       } catch {
-        // Optimistic state + localStorage keeps changes saved
+        // Kept in state & localStorage
       }
     } else {
-      // Optimistic create - appears ON SCREEN IMMEDIATELY!
       const temporaryId = `goal_${Date.now()}`;
       const newGoal: GoalItem = {
         _id: temporaryId,
@@ -611,42 +433,8 @@ export default function DailyGoals() {
       };
 
       setGoals((prev) => [newGoal, ...prev]);
-
-      // Add to perGoalStats immediately so its card and consistency chart show up!
-      setStats((prev) => {
-        if (!prev) return generateInitialClientStats([newGoal, ...goals]);
-        const today = new Date();
-        const dStr = today.toISOString().split('T')[0];
-        const newHeatmap = Array.from({ length: 140 }, (_, i) => ({
-          date: dStr,
-          completed: i > 120 ? Math.random() > 0.4 : false,
-        }));
-        const newStat: PerGoalStat = {
-          goalId: temporaryId,
-          title: trimmedTitle,
-          color: formColor,
-          category: formCategory,
-          currentStreak: 0,
-          bestStreak: 0,
-          last30DaysPercent: 0,
-          totalCheckOffs: 0,
-          heatmap: newHeatmap,
-          consistencyData: [
-            { week: 'Week 1', percentage: 0 },
-            { week: 'Week 2', percentage: 0 },
-            { week: 'Current', percentage: 0 },
-          ],
-        };
-        return {
-          ...prev,
-          totalActiveGoals: prev.totalActiveGoals + 1,
-          perGoalStats: [newStat, ...prev.perGoalStats],
-        };
-      });
-
       setIsModalOpen(false);
 
-      // Background sync to backend MongoDB
       try {
         const res = await fetch('/api/goals', {
           method: 'POST',
@@ -664,23 +452,13 @@ export default function DailyGoals() {
         if (res.ok) {
           const data = await res.json();
           if (data.goal && data.goal._id) {
-            // Replace temporary id with real database id
             setGoals((prev) =>
               prev.map((g) => (g._id === temporaryId ? { ...g, _id: data.goal._id } : g))
             );
-            setStats((prev) => {
-              if (!prev) return prev;
-              return {
-                ...prev,
-                perGoalStats: prev.perGoalStats.map((p) =>
-                  p.goalId === temporaryId ? { ...p, goalId: data.goal._id } : p
-                ),
-              };
-            });
           }
         }
       } catch {
-        // Stays saved in state & localStorage!
+        // Stays in state & localStorage
       }
     }
   };
@@ -689,24 +467,15 @@ export default function DailyGoals() {
   const handleDeleteGoal = async (goalId: string) => {
     if (!confirm('Are you sure you want to remove this daily goal?')) return;
     setGoals((prev) => prev.filter((g) => g._id !== goalId));
-    setStats((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        totalActiveGoals: Math.max(0, prev.totalActiveGoals - 1),
-        perGoalStats: prev.perGoalStats.filter((p) => p.goalId !== goalId),
-      };
-    });
 
     try {
       await fetch(`/api/goals/${goalId}`, { method: 'DELETE' });
-      refreshGoalsAndStats();
     } catch {
-      // Local state and localStorage updated
+      // Kept in sync
     }
   };
 
-  // Color options matching sketch palette & visual reference
+  // Color options
   const colorOptions = [
     { label: 'Cobalt Blue', value: '#2563eb' },
     { label: 'Emerald Green', value: '#10b981' },
@@ -737,13 +506,13 @@ export default function DailyGoals() {
 
   return (
     <div className="min-h-screen bg-[#faf8f5] text-[#141416] pb-24 font-sans selection:bg-[#e11d48] selection:text-white">
-      {/* Dynamic Celebration Toast for Streak Increment */}
+      {/* Toast Notification for Streak */}
       {streakToast && (
         <div className="fixed top-20 right-4 sm:right-8 z-50 animate-in slide-in-from-top-4 duration-300">
           <div className="px-5 py-3.5 bg-[#e11d48] text-white border-2 border-[#18181b] rounded-2xl shadow-[4px_4px_0px_#18181b] flex items-center gap-3">
             <Flame className="w-6 h-6 fill-white text-white animate-bounce" />
             <div>
-              <div className="text-xs font-black uppercase tracking-wider">Streak Incremented!</div>
+              <div className="text-xs font-black uppercase tracking-wider">Streak Updated!</div>
               <div className="text-xs font-medium">{streakToast}</div>
             </div>
             <button
@@ -787,7 +556,7 @@ export default function DailyGoals() {
 
             <button
               onClick={() => refreshGoalsAndStats()}
-              title="Refresh / Sync Stats"
+              title="Refresh Stats"
               className="p-2 bg-white sketch-border-sm hover:bg-slate-100 transition-all text-xs font-bold cursor-pointer"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -816,7 +585,7 @@ export default function DailyGoals() {
               Daily Streak &amp; Goals
             </h1>
             <p className="text-sm sm:text-base text-[#334155] font-medium mt-1">
-              Lock in your daily targets, conquer DSA &amp; system builds, and compound real placement momentum.
+              Add your custom daily targets, track progress, and build your real streak.
             </p>
           </div>
 
@@ -827,7 +596,7 @@ export default function DailyGoals() {
           </div>
         </div>
 
-        {/* 1. TOP METRIC HERO BANNER */}
+        {/* 1. TOP METRIC HERO BANNER (REAL DATA ONLY) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Current Streak */}
           <div className="sketch-card p-5 bg-gradient-to-br from-white to-[#fff1f2] relative overflow-hidden">
@@ -836,7 +605,7 @@ export default function DailyGoals() {
                 Current Streak
               </span>
               <div className="p-2 rounded-xl bg-[#ffe4e6] border border-[#18181b]">
-                <Flame className="w-5 h-5 text-[#e11d48] animate-bounce" />
+                <Flame className="w-5 h-5 text-[#e11d48]" />
               </div>
             </div>
             <div className="flex items-baseline gap-2">
@@ -847,8 +616,8 @@ export default function DailyGoals() {
             </div>
             <p className="text-xs text-[#64748b] mt-2 font-medium">
               {(stats?.currentStreak ?? 0) > 0
-                ? '🔥 Active streak! Complete today’s goals to level up.'
-                : 'Complete today’s goals to ignite your streak!'}
+                ? '🔥 Active streak! Keep checking off targets daily.'
+                : 'Complete today’s targets to start your streak!'}
             </p>
           </div>
 
@@ -869,7 +638,7 @@ export default function DailyGoals() {
               <span className="text-sm font-bold text-[#2563eb]">days</span>
             </div>
             <p className="text-xs text-[#64748b] mt-2 font-medium">
-              Historical personal best across all logged study sessions.
+              Historical personal best across your study sessions.
             </p>
           </div>
 
@@ -899,7 +668,7 @@ export default function DailyGoals() {
             </div>
           </div>
 
-          {/* Weekly Consistency */}
+          {/* Weekly Completion */}
           <div className="sketch-card p-5 bg-gradient-to-br from-white to-[#f5f3ff] relative overflow-hidden">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-black uppercase tracking-wider text-[#64748b]">
@@ -921,24 +690,24 @@ export default function DailyGoals() {
           </div>
         </div>
 
-        {/* STREAK HOW-IT-WORKS EXPLANATION ACCORDION */}
+        {/* STREAK HOW-IT-WORKS INFO PILL */}
         <div className="p-4 bg-white sketch-border-sm flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2.5">
             <Zap className="w-4 h-4 text-[#e11d48] shrink-0" />
             <span className="font-black text-[#141416]">Streak Rules:</span>
             <span className="text-[#334155]">
-              Daily target complete karne par streak <strong>+1 din</strong> badhti hai. Missed day ke baad complete karne se naya streak shuru hota hai.
+              Daily target complete karne par streak <strong>+1 din</strong> badhti hai. Lagatar daily targets complete karte raho!
             </span>
           </div>
           <button
             onClick={() => setShowStreakGuide(true)}
             className="self-start md:self-auto text-xs font-black text-[#e11d48] underline underline-offset-2 hover:text-[#be123c] cursor-pointer"
           >
-            Detailed guide &rarr;
+            Detailed rules &rarr;
           </button>
         </div>
 
-        {/* 2. WEEKLY SUMMARY & DAY-WISE BREAKDOWN */}
+        {/* 2. WEEKLY SUMMARY & DAY-WISE BREAKDOWN (REAL DATA ONLY) */}
         <section className="sketch-card p-6 bg-white space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-slate-100 pb-4">
             <div className="flex items-center gap-3">
@@ -1014,7 +783,7 @@ export default function DailyGoals() {
           </div>
         </section>
 
-        {/* 3. GITHUB-STYLE ACTIVITY HEATMAP (OVERALL) */}
+        {/* 3. GITHUB-STYLE ACTIVITY HEATMAP (REAL LOGGED DATA ONLY) */}
         <section className="sketch-card p-6 bg-white space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-slate-100 pb-3">
             <div>
@@ -1098,7 +867,7 @@ export default function DailyGoals() {
               </div>
               <button
                 onClick={() => setSelectedHeatmapCell(null)}
-                className="text-[#64748b] hover:text-[#141416] font-bold"
+                className="text-[#64748b] hover:text-[#141416] font-bold cursor-pointer"
               >
                 &times; Close
               </button>
@@ -1106,7 +875,7 @@ export default function DailyGoals() {
           )}
         </section>
 
-        {/* 4. TODAY'S DAILY GOALS CHECK-OFF LIST */}
+        {/* 4. ACTIVE DAILY TARGETS LIST */}
         <section className="space-y-4">
           <div className="flex items-center justify-between border-b-2 border-[#18181b] pb-3">
             <div>
@@ -1128,321 +897,143 @@ export default function DailyGoals() {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 gap-4">
-            {goals.map((goal) => {
-              const categoryBadge =
-                goal.category === 'dsa'
-                  ? { label: 'DSA / LeetCode', icon: Code2, bg: 'bg-blue-100 text-blue-800' }
-                  : goal.category === 'project'
-                  ? { label: 'Project Dev', icon: Clock, bg: 'bg-emerald-100 text-emerald-800' }
-                  : goal.category === 'reading'
-                  ? { label: 'Tech Reading', icon: BookOpen, bg: 'bg-purple-100 text-purple-800' }
-                  : { label: 'Interview Prep', icon: Target, bg: 'bg-rose-100 text-rose-800' };
-
-              const Icon = categoryBadge.icon;
-
-              return (
-                <div
-                  key={goal._id}
-                  className={`sketch-card p-5 bg-white transition-all ${
-                    goal.completed ? 'border-[#10b981] bg-emerald-50/30' : ''
-                  }`}
+          {/* Empty State when user has 0 goals */}
+          {goals.length === 0 ? (
+            <div className="sketch-card p-10 bg-white text-center space-y-4">
+              <div className="w-14 h-14 mx-auto rounded-2xl bg-[#ffe4e6] border-2 border-[#18181b] flex items-center justify-center text-[#e11d48] shadow-[2px_2px_0px_#18181b]">
+                <Target className="w-7 h-7" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-lg font-black text-[#141416]">No Daily Targets Yet</h3>
+                <p className="text-xs text-[#64748b] max-w-sm mx-auto">
+                  Click <strong>&quot;Add Daily Target&quot;</strong> to set your first goal (e.g. Solve 2 DSA problems, Spend 60 mins on project) and start your streak!
+                </p>
+              </div>
+              <div>
+                <button
+                  onClick={handleOpenCreateModal}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#e11d48] text-white text-xs font-black uppercase tracking-wider sketch-border-sm hover:bg-[#be123c] cursor-pointer shadow-sm active:translate-y-0.5"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    {/* Left: Checkbox + Goal Info */}
-                    <div className="flex items-start sm:items-center gap-3.5 flex-1">
-                      <button
-                        onClick={() => handleToggleCompleted(goal)}
-                        className={`mt-0.5 sm:mt-0 p-1.5 rounded-xl border-2 transition-transform duration-150 active:scale-95 cursor-pointer ${
-                          goal.completed
-                            ? 'bg-[#10b981] border-[#18181b] text-white shadow-[2px_2px_0px_#18181b]'
-                            : 'bg-white border-[#18181b] text-slate-300 hover:border-[#10b981]'
-                        }`}
-                        title={goal.completed ? 'Mark incomplete' : 'Mark completed (+1 to Streak!)'}
-                      >
-                        {goal.completed ? (
-                          <CheckCircle2 className="w-6 h-6 stroke-[2.5]" />
-                        ) : (
-                          <Circle className="w-6 h-6 stroke-[2]" />
-                        )}
-                      </button>
+                  <Plus className="w-4 h-4 stroke-[3]" />
+                  <span>Create Your First Target</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4">
+              {goals.map((goal) => {
+                const categoryBadge =
+                  goal.category === 'dsa'
+                    ? { label: 'DSA / LeetCode', icon: Code2, bg: 'bg-blue-100 text-blue-800' }
+                    : goal.category === 'project'
+                    ? { label: 'Project Dev', icon: Clock, bg: 'bg-emerald-100 text-emerald-800' }
+                    : goal.category === 'reading'
+                    ? { label: 'Tech Reading', icon: BookOpen, bg: 'bg-purple-100 text-purple-800' }
+                    : { label: 'Interview Prep', icon: Target, bg: 'bg-rose-100 text-rose-800' };
 
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span
-                            className="w-2.5 h-2.5 rounded-full inline-block"
-                            style={{ backgroundColor: goal.color }}
-                          ></span>
-                          <h3
-                            className={`text-base sm:text-lg font-black tracking-tight ${
-                              goal.completed ? 'line-through text-[#64748b]' : 'text-[#141416]'
-                            }`}
-                          >
-                            {goal.title}
-                          </h3>
-                          <span
-                            className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-[#18181b] flex items-center gap-1 ${categoryBadge.bg}`}
-                          >
-                            <Icon className="w-3 h-3" />
-                            {categoryBadge.label}
-                          </span>
-                        </div>
-                        {goal.description && (
-                          <p className="text-xs text-[#64748b]">{goal.description}</p>
-                        )}
-                      </div>
-                    </div>
+                const Icon = categoryBadge.icon;
 
-                    {/* Right: Numeric Counter & Actions */}
-                    <div className="flex items-center gap-3 self-end sm:self-center">
-                      <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border-2 border-[#18181b]">
+                return (
+                  <div
+                    key={goal._id}
+                    className={`sketch-card p-5 bg-white transition-all ${
+                      goal.completed ? 'border-[#10b981] bg-emerald-50/30' : ''
+                    }`}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      {/* Left: Checkbox + Goal Info */}
+                      <div className="flex items-start sm:items-center gap-3.5 flex-1">
                         <button
-                          onClick={() => handleProgressDelta(goal._id, -1)}
-                          disabled={goal.currentValue <= 0}
-                          className="w-7 h-7 flex items-center justify-center bg-white rounded-lg border border-slate-300 font-bold hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
+                          onClick={() => handleToggleCompleted(goal)}
+                          className={`mt-0.5 sm:mt-0 p-1.5 rounded-xl border-2 transition-transform duration-150 active:scale-95 cursor-pointer ${
+                            goal.completed
+                              ? 'bg-[#10b981] border-[#18181b] text-white shadow-[2px_2px_0px_#18181b]'
+                              : 'bg-white border-[#18181b] text-slate-300 hover:border-[#10b981]'
+                          }`}
+                          title={goal.completed ? 'Mark incomplete' : 'Mark completed (+1 to Streak!)'}
                         >
-                          <Minus className="w-3.5 h-3.5" />
+                          {goal.completed ? (
+                            <CheckCircle2 className="w-6 h-6 stroke-[2.5]" />
+                          ) : (
+                            <Circle className="w-6 h-6 stroke-[2]" />
+                          )}
                         </button>
-                        <div className="px-2 text-center min-w-[65px]">
-                          <span className="text-sm font-black text-[#141416]">
-                            {goal.currentValue}
-                          </span>
-                          <span className="text-xs text-[#64748b]">
-                            /{goal.targetValue} {goal.unit}
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => handleProgressDelta(goal._id, 1)}
-                          className="w-7 h-7 flex items-center justify-center bg-[#18181b] text-white rounded-lg font-bold hover:bg-slate-800 active:scale-95 cursor-pointer"
-                        >
-                          <Plus className="w-3.5 h-3.5 stroke-[3]" />
-                        </button>
-                      </div>
 
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={() => handleOpenEditModal(goal)}
-                          title="Edit target"
-                          className="p-2 bg-white sketch-border-sm hover:bg-slate-100 text-[#141416]"
-                        >
-                          <Edit3 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteGoal(goal._id)}
-                          title="Delete target"
-                          className="p-2 bg-white sketch-border-sm hover:bg-[#ffe4e6] text-[#e11d48]"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* 5. PER-GOAL DETAILED CARDS (MATCHING VISUAL REFERENCE SCREENSHOT EXACTLY!) */}
-        <section className="space-y-6 pt-4">
-          <div className="border-b-2 border-[#18181b] pb-3">
-            <h2 className="text-xl font-black text-[#141416] tracking-tight flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-[#2563eb]" />
-              <span>Target-by-Target Analytics &amp; Consistency</span>
-            </h2>
-            <p className="text-xs text-[#64748b]">
-              Individual streak milestones, activity square matrices, and 12-week trend graphs matching professional habit trackers.
-            </p>
-          </div>
-
-          <div className="space-y-8">
-            {stats?.perGoalStats.map((gStat) => {
-              const activeRange = chartRanges[gStat.goalId] || '12weeks';
-
-              return (
-                <div
-                  key={gStat.goalId}
-                  className="rounded-2xl border-2 border-[#18181b] bg-[#1a1f2c] text-white p-6 shadow-[5px_5px_0px_#18181b] space-y-6"
-                >
-                  {/* Top Bar: Colored Dot + Goal Title + Daily badge */}
-                  <div className="flex items-center justify-between border-b border-slate-700 pb-3">
-                    <div className="flex items-center gap-2.5">
-                      <span
-                        className="w-3.5 h-3.5 rounded-full inline-block"
-                        style={{ backgroundColor: gStat.color }}
-                      ></span>
-                      <h3 className="text-lg sm:text-xl font-black text-white tracking-tight">
-                        {gStat.title}
-                      </h3>
-                    </div>
-                    <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
-                      Daily
-                    </span>
-                  </div>
-
-                  {/* 4 Metric Boxes (Direct match to reference image) */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className="bg-[#111622] p-4 rounded-xl border border-slate-800">
-                      <div className="text-2xl font-black text-white">
-                        {gStat.currentStreak} <span className="text-xs font-normal text-slate-400">days</span>
-                      </div>
-                      <div className="text-xs text-slate-400 mt-1">Current streak</div>
-                    </div>
-
-                    <div className="bg-[#111622] p-4 rounded-xl border border-slate-800">
-                      <div className="text-2xl font-black text-white">
-                        {gStat.bestStreak} <span className="text-xs font-normal text-slate-400">days</span>
-                      </div>
-                      <div className="text-xs text-slate-400 mt-1">Best streak</div>
-                    </div>
-
-                    <div className="bg-[#111622] p-4 rounded-xl border border-slate-800">
-                      <div className="text-2xl font-black text-white">
-                        {gStat.last30DaysPercent}%
-                      </div>
-                      <div className="text-xs text-slate-400 mt-1">Last 30 days</div>
-                    </div>
-
-                    <div className="bg-[#111622] p-4 rounded-xl border border-slate-800">
-                      <div className="text-2xl font-black text-white">
-                        {gStat.totalCheckOffs}
-                      </div>
-                      <div className="text-xs text-slate-400 mt-1">Total check-offs</div>
-                    </div>
-                  </div>
-
-                  {/* GitHub-Style Mini Square Grid for this Goal */}
-                  <div className="bg-[#111622] p-4 rounded-xl border border-slate-800 overflow-x-auto">
-                    <div className="flex items-center justify-between text-[11px] text-slate-400 mb-2">
-                      <div className="flex gap-8">
-                        <span>Jul</span>
-                        <span>Aug</span>
-                        <span>Sep</span>
-                        <span>Oct</span>
-                        <span>Nov</span>
-                        <span>Dec</span>
-                        <span>Jan</span>
-                        <span>Feb</span>
-                        <span>Mar</span>
-                        <span>Apr</span>
-                        <span>May</span>
-                        <span>Jun</span>
-                        <span>Jul</span>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-1.5 min-w-[650px]">
-                      {/* Mon / Wed / Fri labels */}
-                      <div className="flex flex-col justify-between text-[9px] text-slate-500 pr-1 select-none">
-                        <span>Mon</span>
-                        <span>Wed</span>
-                        <span>Fri</span>
-                      </div>
-
-                      {/* 20 weeks of 7 squares */}
-                      {Array.from({ length: 20 }).map((_, wIdx) => {
-                        const weekSlice = gStat.heatmap.slice(wIdx * 7, (wIdx + 1) * 7);
-                        return (
-                          <div key={wIdx} className="flex flex-col gap-1.5">
-                            {weekSlice.map((day, dIdx) => (
-                              <div
-                                key={dIdx}
-                                title={`${day.date}: ${day.completed ? 'Checked Off' : 'Not completed'}`}
-                                className={`w-3.5 h-3.5 rounded-[3px] transition-transform hover:scale-125 ${
-                                  day.completed ? '' : 'bg-slate-800/80 border border-slate-800'
-                                }`}
-                                style={{
-                                  backgroundColor: day.completed ? gStat.color : undefined,
-                                }}
-                              />
-                            ))}
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span
+                              className="w-2.5 h-2.5 rounded-full inline-block"
+                              style={{ backgroundColor: goal.color }}
+                            ></span>
+                            <h3
+                              className={`text-base sm:text-lg font-black tracking-tight ${
+                                goal.completed ? 'line-through text-[#64748b]' : 'text-[#141416]'
+                              }`}
+                            >
+                              {goal.title}
+                            </h3>
+                            <span
+                              className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-[#18181b] flex items-center gap-1 ${categoryBadge.bg}`}
+                            >
+                              <Icon className="w-3 h-3" />
+                              {categoryBadge.label}
+                            </span>
                           </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                          {goal.description && (
+                            <p className="text-xs text-[#64748b]">{goal.description}</p>
+                          )}
+                        </div>
+                      </div>
 
-                  {/* Consistency Trend Chart (Recharts line chart) */}
-                  <div className="bg-[#111622] p-4 rounded-xl border border-slate-800 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-bold text-white">Consistency</h4>
-                      <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800 text-xs">
-                        <button
-                          onClick={() =>
-                            setChartRanges((prev) => ({ ...prev, [gStat.goalId]: '12weeks' }))
-                          }
-                          className={`px-2.5 py-1 rounded-md text-xs font-semibold cursor-pointer ${
-                            activeRange === '12weeks'
-                              ? 'bg-slate-700 text-white'
-                              : 'text-slate-400 hover:text-white'
-                          }`}
-                        >
-                          12 weeks
-                        </button>
-                        <button
-                          onClick={() =>
-                            setChartRanges((prev) => ({ ...prev, [gStat.goalId]: '6months' }))
-                          }
-                          className={`px-2.5 py-1 rounded-md text-xs font-semibold cursor-pointer ${
-                            activeRange === '6months'
-                              ? 'bg-slate-700 text-white'
-                              : 'text-slate-400 hover:text-white'
-                          }`}
-                        >
-                          6 months
-                        </button>
+                      {/* Right: Numeric Counter & Actions */}
+                      <div className="flex items-center gap-3 self-end sm:self-center">
+                        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border-2 border-[#18181b]">
+                          <button
+                            onClick={() => handleProgressDelta(goal._id, -1)}
+                            disabled={goal.currentValue <= 0}
+                            className="w-7 h-7 flex items-center justify-center bg-white rounded-lg border border-slate-300 font-bold hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                          >
+                            <Minus className="w-3.5 h-3.5" />
+                          </button>
+                          <div className="px-2 text-center min-w-[65px]">
+                            <span className="text-sm font-black text-[#141416]">
+                              {goal.currentValue}
+                            </span>
+                            <span className="text-xs text-[#64748b]">
+                              /{goal.targetValue} {goal.unit}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => handleProgressDelta(goal._id, 1)}
+                            className="w-7 h-7 flex items-center justify-center bg-[#18181b] text-white rounded-lg font-bold hover:bg-slate-800 active:scale-95 cursor-pointer"
+                          >
+                            <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => handleOpenEditModal(goal)}
+                            title="Edit target"
+                            className="p-2 bg-white sketch-border-sm hover:bg-slate-100 text-[#141416] cursor-pointer"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteGoal(goal._id)}
+                            title="Delete target"
+                            className="p-2 bg-white sketch-border-sm hover:bg-[#ffe4e6] text-[#e11d48] cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
                     </div>
-
-                    {/* Line Chart */}
-                    <div className="h-44 w-full pt-2">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={gStat.consistencyData}>
-                          <XAxis
-                            dataKey="week"
-                            stroke="#64748b"
-                            tick={{ fill: '#94a3b8', fontSize: 10 }}
-                            axisLine={false}
-                            tickLine={false}
-                          />
-                          <YAxis
-                            stroke="#64748b"
-                            tick={{ fill: '#94a3b8', fontSize: 10 }}
-                            domain={[0, 100]}
-                            ticks={[0, 50, 100]}
-                            unit="%"
-                            axisLine={false}
-                            tickLine={false}
-                          />
-                          <Tooltip
-                            contentStyle={{
-                              backgroundColor: '#0f172a',
-                              border: '1px solid #334155',
-                              borderRadius: '8px',
-                              color: '#fff',
-                              fontSize: '12px',
-                            }}
-                            formatter={(value: unknown) => {
-                              const num = typeof value === 'number' ? value : Number(value);
-                              return [`${num}%`, 'Consistency'];
-                            }}
-                          />
-                          <Line
-                            type="monotone"
-                            dataKey="percentage"
-                            stroke={gStat.color}
-                            strokeWidth={2.5}
-                            dot={{ fill: gStat.color, r: 3.5, stroke: '#111622', strokeWidth: 1.5 }}
-                            activeDot={{ r: 6, fill: '#fff', stroke: gStat.color, strokeWidth: 2 }}
-                          />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </section>
       </main>
 
@@ -1452,7 +1043,7 @@ export default function DailyGoals() {
           <div className="sketch-card w-full max-w-lg bg-white p-6 relative animate-in fade-in zoom-in-95 duration-200">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 p-1.5 rounded-lg border-2 border-[#18181b] bg-white hover:bg-slate-100 text-[#141416]"
+              className="absolute top-4 right-4 p-1.5 rounded-lg border-2 border-[#18181b] bg-white hover:bg-slate-100 text-[#141416] cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -1531,7 +1122,7 @@ export default function DailyGoals() {
                 <label className="block uppercase tracking-wider mb-1">Target Unit</label>
                 <input
                   type="text"
-                  placeholder="e.g. problems, mins, pages, rounds"
+                  placeholder="e.g. problems, mins, pages, tasks"
                   value={formUnit}
                   onChange={(e) => setFormUnit(e.target.value)}
                   className="w-full px-3 py-2 bg-slate-50 border-2 border-[#18181b] rounded-xl text-sm focus:outline-none"
@@ -1589,7 +1180,7 @@ export default function DailyGoals() {
           <div className="sketch-card w-full max-w-lg bg-white p-6 relative animate-in fade-in zoom-in-95 duration-200 space-y-4">
             <button
               onClick={() => setShowStreakGuide(false)}
-              className="absolute top-4 right-4 p-1.5 rounded-lg border-2 border-[#18181b] bg-white hover:bg-slate-100 text-[#141416]"
+              className="absolute top-4 right-4 p-1.5 rounded-lg border-2 border-[#18181b] bg-white hover:bg-slate-100 text-[#141416] cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -1609,7 +1200,7 @@ export default function DailyGoals() {
                   1. Target Complete Kaise Hoga?
                 </span>
                 <p>
-                  Target card me `+` button daba kar target value tak pahocho (e.g. 2/2 problems), ya direct circular checkmark pe click karke use complete mark karo.
+                  Target card me `+` button daba kar target value tak pahocho, ya direct circular checkmark pe click karke use complete mark karo.
                 </p>
               </div>
 
@@ -1619,7 +1210,7 @@ export default function DailyGoals() {
                   2. Streak Kab Badhega?
                 </span>
                 <p>
-                  Jaise hi aap aaj ka daily target complete karte ho, aapka <strong>Current Streak +1 din</strong> badh jata hai, aur heatmap me aaj ka square dark green ho jata hai.
+                  Jaise hi aap apna daily target complete karte ho, aapka <strong>Current Streak +1 din</strong> badh jata hai, aur heatmap me aaj ka square cell dark green ho jata hai.
                 </p>
               </div>
 
@@ -1639,7 +1230,7 @@ export default function DailyGoals() {
                   4. Best Streak
                 </span>
                 <p>
-                  Aapki ab tak ki longest consecutive days ki continuous study record ko <strong>Best Streak</strong> me permanently track kiya jata hai.
+                  Aapki ab tak ki continuous days ki study record ko <strong>Best Streak</strong> me permanently track kiya jata hai.
                 </p>
               </div>
             </div>
@@ -1647,7 +1238,7 @@ export default function DailyGoals() {
             <div className="pt-2 flex justify-end">
               <button
                 onClick={() => setShowStreakGuide(false)}
-                className="px-5 py-2 bg-[#e11d48] text-white text-xs font-black uppercase tracking-wider rounded-xl border-2 border-[#18181b] shadow-[2px_2px_0px_#18181b] hover:bg-[#be123c]"
+                className="px-5 py-2 bg-[#e11d48] text-white text-xs font-black uppercase tracking-wider rounded-xl border-2 border-[#18181b] shadow-[2px_2px_0px_#18181b] hover:bg-[#be123c] cursor-pointer"
               >
                 Samajh gaya / Got It!
               </button>
