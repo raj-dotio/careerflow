@@ -20,9 +20,11 @@ import {
   Mail,
   Phone,
   MapPin,
-  Zap,
+  ArrowLeft,
+  Flame,
 } from 'lucide-react';
 import { type ResumeData, initialSampleResume } from '../utils/sampleResume';
+import logo2 from '../assets/new2.png';
 
 export default function ResumeBuilder() {
   const navigate = useNavigate();
@@ -123,12 +125,12 @@ export default function ResumeBuilder() {
         experience: [
           ...prev.sections.experience,
           {
-            id: `exp-${Date.now()}`,
+            id: `exp_${Date.now()}`,
             company: 'Tech Company Inc.',
             position: 'Software Engineer',
-            location: 'Remote',
-            date: 'Jan 2025 – Present',
-            summary: '• Designed and implemented high-performance backend microservices.\n• Collaborated on core product architecture.',
+            location: 'Bengaluru / Remote',
+            date: 'June 2025 – Present',
+            summary: '• Architected resilient microservices reducing API latency by 35%.\n• Collaborated with product team on high-concurrency event ingestion.',
           },
         ],
       },
@@ -153,11 +155,11 @@ export default function ResumeBuilder() {
         education: [
           ...prev.sections.education,
           {
-            id: `edu-${Date.now()}`,
-            institution: 'University of Technology',
-            degree: 'Bachelor of Science in Computer Science',
-            fieldOfStudy: 'Software Engineering',
-            score: 'GPA: 3.8 / 4.0',
+            id: `edu_${Date.now()}`,
+            institution: 'National Institute of Technology',
+            degree: 'B.Tech in Computer Science',
+            fieldOfStudy: 'Computer Science & Engineering',
+            score: '8.8 / 10 CGPA',
             date: '2022 – 2026',
           },
         ],
@@ -183,11 +185,11 @@ export default function ResumeBuilder() {
         projects: [
           ...prev.sections.projects,
           {
-            id: `proj-${Date.now()}`,
-            name: 'New Cloud Application',
-            description: 'Architected full-stack web application with responsive UI and authenticated RESTful APIs.',
-            url: 'https://github.com/my-project',
-            keywords: ['React', 'Node.js', 'PostgreSQL'],
+            id: `proj_${Date.now()}`,
+            name: 'Distributed Cloud Storage Engine',
+            description: 'Engineered high-throughput sharded distributed file cache in Go and Redis with Raft consensus.',
+            url: 'https://github.com/candidate/cloud-storage',
+            keywords: ['Go', 'Redis', 'Docker', 'gRPC'],
           },
         ],
       },
@@ -213,9 +215,9 @@ export default function ResumeBuilder() {
         skills: [
           ...prev.sections.skills,
           {
-            id: `sk-${Date.now()}`,
+            id: `skill_${Date.now()}`,
             name: newSkillGroup.trim(),
-            keywords: [],
+            keywords: ['Skill 1', 'Skill 2'],
           },
         ],
       },
@@ -253,21 +255,45 @@ export default function ResumeBuilder() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f4f4f5] text-[#141416] font-sans antialiased">
+    <div className="min-h-screen bg-[#faf8f5] text-[#141416] font-sans antialiased selection:bg-[#e11d48] selection:text-white">
+      {/* Print isolation style */}
+      <style>{`
+        @media print {
+          body {
+            background: white !important;
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+          #resume-printable {
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            margin: 0 auto !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            min-height: auto !important;
+          }
+        }
+      `}</style>
+
       {/* 1. Header Toolbar (No Print) */}
-      <header className="no-print sticky top-0 z-40 bg-white border-b border-[#e4e4e7] px-4 py-3 shadow-xs">
-        <div className="max-w-[1440px] mx-auto flex flex-wrap items-center justify-between gap-3">
+      <header className="no-print sticky top-0 z-40 bg-[#faf8f5]/95 backdrop-blur-md border-b-2 border-[#18181b] px-4 sm:px-6 py-2.5">
+        <div className="max-w-[1500px] mx-auto flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <div className="w-7 h-7 rounded-[6px] bg-[#e11d48] border border-[#18181b] flex items-center justify-center p-1 text-white">
-                <GraduationCap className="w-full h-full" />
-              </div>
-              <span className="font-extrabold text-[16px] text-[#141416]">CareerFlow</span>
+            <Link to="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity shrink-0">
+              <img src={logo2} alt="CareerFlow Logo" className="h-10 sm:h-12 w-auto object-contain" />
             </Link>
-            <span className="text-[#a1a1aa]">/</span>
-            <span className="font-semibold text-[13px] text-[#71717a]">Reactive Resume Builder</span>
+            <span className="text-[#a1a1aa] font-bold">/</span>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white sketch-border-sm text-[12px] font-bold text-[#141416]">
+              <Sparkles className="w-3.5 h-3.5 text-[#e11d48]" />
+              <span>Reactive Resume Builder</span>
+            </div>
             {saveStatus && (
-              <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[11px] font-mono font-bold rounded-md border border-emerald-200">
+              <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-800 text-[11px] font-mono font-bold rounded-lg border-2 border-emerald-600 shadow-[1px_1px_0px_#059669]">
                 {saveStatus}
               </span>
             )}
@@ -275,24 +301,24 @@ export default function ResumeBuilder() {
 
           <div className="flex flex-wrap items-center gap-2">
             <Link
+              to="/"
+              className="sketch-btn-white px-3 py-1.5 text-[12px] font-bold hover:bg-[#ffe4e6] flex items-center gap-1.5 cursor-pointer"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-[#141416]" />
+              <span>Home</span>
+            </Link>
+
+            <Link
               to="/skills"
-              className="px-3 py-1.5 bg-white border border-[#d4d4d8] text-[#18181b] rounded-md text-[12px] font-bold hover:bg-[#f4f4f5] transition-all flex items-center gap-1.5"
+              className="sketch-btn-white px-3 py-1.5 text-[12px] font-bold hover:bg-[#ffe4e6] flex items-center gap-1.5 cursor-pointer"
             >
               <Award className="w-3.5 h-3.5 text-[#e11d48]" />
               <span>Skill Tracker</span>
             </Link>
 
-            <Link
-              to="/challenge/setup"
-              className="px-3 py-1.5 bg-white border border-[#d4d4d8] text-[#18181b] rounded-md text-[12px] font-bold hover:bg-[#f4f4f5] transition-all flex items-center gap-1.5"
-            >
-              <Zap className="w-3.5 h-3.5 text-[#e11d48]" />
-              <span>Quick Challenge</span>
-            </Link>
-
             <button
               onClick={handleTestAts}
-              className="px-3.5 py-1.5 bg-[#e11d48] text-white rounded-md text-[12px] font-bold hover:bg-[#be123c] transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
+              className="sketch-btn-red px-3.5 py-1.5 text-[12px] font-bold flex items-center gap-1.5 shadow-[2px_2px_0px_#18181b] cursor-pointer"
             >
               <FileCheck className="w-3.5 h-3.5" />
               <span>Check ATS Score</span>
@@ -300,15 +326,15 @@ export default function ResumeBuilder() {
 
             <button
               onClick={handlePrint}
-              className="px-3 py-1.5 bg-white border border-[#d4d4d8] text-[#18181b] rounded-md text-[12px] font-bold hover:bg-[#f4f4f5] transition-all flex items-center gap-1.5 cursor-pointer"
+              className="sketch-btn-white px-3 py-1.5 text-[12px] font-bold flex items-center gap-1.5 cursor-pointer"
             >
-              <Printer className="w-3.5 h-3.5" />
+              <Printer className="w-3.5 h-3.5 text-[#e11d48]" />
               <span>Download PDF</span>
             </button>
 
             <button
               onClick={handleLoadSample}
-              className="px-3 py-1.5 bg-white border border-[#d4d4d8] text-[#18181b] rounded-md text-[12px] font-medium hover:bg-[#f4f4f5] transition-all flex items-center gap-1.5"
+              className="sketch-btn-white px-3 py-1.5 text-[12px] font-semibold hover:bg-[#ffe4e6] flex items-center gap-1.5 cursor-pointer"
               title="Load full student template"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -317,7 +343,7 @@ export default function ResumeBuilder() {
 
             <button
               onClick={handleExportJson}
-              className="px-3 py-1.5 bg-white border border-[#d4d4d8] text-[#18181b] rounded-md text-[12px] font-medium hover:bg-[#f4f4f5] transition-all flex items-center gap-1.5"
+              className="sketch-btn-white px-3 py-1.5 text-[12px] font-semibold hover:bg-[#ffe4e6] flex items-center gap-1.5 cursor-pointer"
               title="Export Reactive Resume JSON"
             >
               <Download className="w-3.5 h-3.5" />
@@ -326,7 +352,7 @@ export default function ResumeBuilder() {
 
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="px-3 py-1.5 bg-white border border-[#d4d4d8] text-[#18181b] rounded-md text-[12px] font-medium hover:bg-[#f4f4f5] transition-all flex items-center gap-1.5"
+              className="sketch-btn-white px-3 py-1.5 text-[12px] font-semibold hover:bg-[#ffe4e6] flex items-center gap-1.5 cursor-pointer"
             >
               <Upload className="w-3.5 h-3.5" />
               <span>Import</span>
@@ -341,9 +367,9 @@ export default function ResumeBuilder() {
 
             <button
               onClick={handleSaveToCloud}
-              className="px-3 py-1.5 bg-[#18181b] text-white rounded-md text-[12px] font-bold hover:bg-black transition-all flex items-center gap-1.5"
+              className="sketch-btn-white px-3.5 py-1.5 text-[12px] font-bold hover:bg-[#ffe4e6] flex items-center gap-1.5 cursor-pointer"
             >
-              <Check className="w-3.5 h-3.5" />
+              <Check className="w-3.5 h-3.5 text-emerald-600" />
               <span>Save</span>
             </button>
           </div>
@@ -351,13 +377,13 @@ export default function ResumeBuilder() {
       </header>
 
       {/* 2. Main Workspace Layout */}
-      <div className="max-w-[1440px] mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="max-w-[1500px] mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* =========================================================
             LEFT COLUMN: SECTION ACCORDION FORM EDITOR (No Print)
         ========================================================= */}
-        <div className="no-print lg:col-span-5 bg-white rounded-[16px] border border-[#e4e4e7] shadow-xs flex flex-col h-[calc(100vh-100px)] overflow-hidden">
+        <div className="no-print lg:col-span-5 bg-white rounded-2xl border-2 border-[#18181b] shadow-[4px_4px_0px_#18181b] flex flex-col h-[calc(100vh-100px)] overflow-hidden">
           {/* Section Navigation Tabs */}
-          <div className="border-b border-[#e4e4e7] p-2 flex overflow-x-auto gap-1 bg-[#fafafa]">
+          <div className="border-b-2 border-[#18181b] p-2 flex overflow-x-auto gap-1.5 bg-[#faf8f5]">
             {[
               { id: 'basics', label: 'Basics', icon: User },
               { id: 'experience', label: 'Experience', icon: Briefcase },
@@ -368,14 +394,15 @@ export default function ResumeBuilder() {
               { id: 'style', label: 'Theme', icon: Sparkles },
             ].map((tab) => {
               const IconComp = tab.icon;
+              const isActive = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as 'basics' | 'experience' | 'education' | 'skills' | 'projects' | 'awards' | 'style')}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-[12px] font-semibold whitespace-nowrap transition-all ${
-                    activeTab === tab.id
-                      ? 'bg-white text-[#e11d48] border border-[#e4e4e7] shadow-xs'
-                      : 'text-[#71717a] hover:text-[#18181b]'
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[12px] font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-[#e11d48] text-white border-2 border-[#18181b] shadow-[2px_2px_0px_#18181b]'
+                      : 'bg-white text-[#3f3f46] border-2 border-transparent hover:border-[#18181b] hover:shadow-[1px_1px_0px_#18181b]'
                   }`}
                 >
                   <IconComp className="w-3.5 h-3.5" />
@@ -390,116 +417,131 @@ export default function ResumeBuilder() {
             {/* TAB: BASICS */}
             {activeTab === 'basics' && (
               <div className="space-y-4">
-                <h3 className="font-bold text-[15px] text-[#18181b]">Personal Information</h3>
+                <div className="flex items-center justify-between border-b-2 border-[#18181b] pb-2">
+                  <h3 className="font-extrabold text-[15px] text-[#18181b] flex items-center gap-2">
+                    <User className="w-4 h-4 text-[#e11d48]" />
+                    <span>Personal Information</span>
+                  </h3>
+                  <span className="font-hand text-[15px] text-[#e11d48] font-bold">✨ Contact &amp; Links</span>
+                </div>
 
                 <div>
-                  <label className="block text-[11px] font-mono text-[#71717a] mb-1">FULL NAME</label>
+                  <label className="block text-[11px] font-mono font-bold text-[#71717a] mb-1.5 uppercase">FULL NAME</label>
                   <input
                     type="text"
                     value={resume.basics.name}
                     onChange={(e) =>
                       setResume({ ...resume, basics: { ...resume.basics, name: e.target.value } })
                     }
-                    className="w-full px-3 py-2 rounded-md border border-[#d4d4d8] text-[13px] focus:outline-none focus:border-[#e11d48]"
+                    placeholder="e.g. Rahul Sharma"
+                    className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-mono text-[#71717a] mb-1">HEADLINE / TARGET ROLE</label>
+                  <label className="block text-[11px] font-mono font-bold text-[#71717a] mb-1.5 uppercase">HEADLINE / TARGET ROLE</label>
                   <input
                     type="text"
                     value={resume.basics.headline}
                     onChange={(e) =>
                       setResume({ ...resume, basics: { ...resume.basics, headline: e.target.value } })
                     }
-                    className="w-full px-3 py-2 rounded-md border border-[#d4d4d8] text-[13px] focus:outline-none focus:border-[#e11d48]"
+                    placeholder="e.g. Full-Stack Software Engineer"
+                    className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] font-mono text-[#71717a] mb-1">EMAIL</label>
+                    <label className="block text-[11px] font-mono font-bold text-[#71717a] mb-1.5 uppercase">EMAIL</label>
                     <input
                       type="email"
                       value={resume.basics.email}
                       onChange={(e) =>
                         setResume({ ...resume, basics: { ...resume.basics, email: e.target.value } })
                       }
-                      className="w-full px-3 py-2 rounded-md border border-[#d4d4d8] text-[13px] focus:outline-none focus:border-[#e11d48]"
+                      placeholder="rahul@example.com"
+                      className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-mono text-[#71717a] mb-1">PHONE</label>
+                    <label className="block text-[11px] font-mono font-bold text-[#71717a] mb-1.5 uppercase">PHONE</label>
                     <input
                       type="text"
                       value={resume.basics.phone}
                       onChange={(e) =>
                         setResume({ ...resume, basics: { ...resume.basics, phone: e.target.value } })
                       }
-                      className="w-full px-3 py-2 rounded-md border border-[#d4d4d8] text-[13px] focus:outline-none focus:border-[#e11d48]"
+                      placeholder="+91 98765 43210"
+                      className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all"
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] font-mono text-[#71717a] mb-1">LOCATION</label>
+                    <label className="block text-[11px] font-mono font-bold text-[#71717a] mb-1.5 uppercase">LOCATION</label>
                     <input
                       type="text"
                       value={resume.basics.location}
                       onChange={(e) =>
                         setResume({ ...resume, basics: { ...resume.basics, location: e.target.value } })
                       }
-                      className="w-full px-3 py-2 rounded-md border border-[#d4d4d8] text-[13px] focus:outline-none focus:border-[#e11d48]"
+                      placeholder="Bengaluru, India"
+                      className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-mono text-[#71717a] mb-1">WEBSITE / PORTFOLIO</label>
+                    <label className="block text-[11px] font-mono font-bold text-[#71717a] mb-1.5 uppercase">PORTFOLIO / WEBSITE</label>
                     <input
                       type="text"
                       value={resume.basics.url}
                       onChange={(e) =>
                         setResume({ ...resume, basics: { ...resume.basics, url: e.target.value } })
                       }
-                      className="w-full px-3 py-2 rounded-md border border-[#d4d4d8] text-[13px] focus:outline-none focus:border-[#e11d48]"
+                      placeholder="https://rahul.dev"
+                      className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all"
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] font-mono text-[#71717a] mb-1">GITHUB PROFILE</label>
+                    <label className="block text-[11px] font-mono font-bold text-[#71717a] mb-1.5 uppercase">GITHUB PROFILE</label>
                     <input
                       type="text"
                       value={resume.basics.github || ''}
                       onChange={(e) =>
                         setResume({ ...resume, basics: { ...resume.basics, github: e.target.value } })
                       }
-                      className="w-full px-3 py-2 rounded-md border border-[#d4d4d8] text-[13px] focus:outline-none focus:border-[#e11d48]"
+                      placeholder="github.com/rahul"
+                      className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-mono text-[#71717a] mb-1">LINKEDIN URL</label>
+                    <label className="block text-[11px] font-mono font-bold text-[#71717a] mb-1.5 uppercase">LINKEDIN URL</label>
                     <input
                       type="text"
                       value={resume.basics.linkedin || ''}
                       onChange={(e) =>
                         setResume({ ...resume, basics: { ...resume.basics, linkedin: e.target.value } })
                       }
-                      className="w-full px-3 py-2 rounded-md border border-[#d4d4d8] text-[13px] focus:outline-none focus:border-[#e11d48]"
+                      placeholder="linkedin.com/in/rahul"
+                      className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-mono text-[#71717a] mb-1">
+                  <label className="block text-[11px] font-mono font-bold text-[#71717a] mb-1.5 uppercase">
                     EXECUTIVE SUMMARY (OBJECTIVE)
                   </label>
                   <textarea
                     rows={4}
                     value={resume.summary}
                     onChange={(e) => setResume({ ...resume, summary: e.target.value })}
-                    className="w-full px-3 py-2 rounded-md border border-[#d4d4d8] text-[13px] focus:outline-none focus:border-[#e11d48]"
+                    placeholder="Brief 2-3 sentence overview of your technical background, core impact, and target placement goals..."
+                    className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#18181b] text-[13px] bg-white font-medium focus:outline-none focus:border-[#e11d48] focus:shadow-[2px_2px_0px_#e11d48] transition-all leading-relaxed"
                   />
                 </div>
               </div>
@@ -508,30 +550,35 @@ export default function ResumeBuilder() {
             {/* TAB: EXPERIENCE */}
             {activeTab === 'experience' && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-[15px] text-[#18181b]">Work &amp; Internship Experience</h3>
+                <div className="flex items-center justify-between border-b-2 border-[#18181b] pb-2">
+                  <h3 className="font-extrabold text-[15px] text-[#18181b] flex items-center gap-2">
+                    <Briefcase className="w-4 h-4 text-[#e11d48]" />
+                    <span>Work &amp; Internship Experience</span>
+                  </h3>
                   <button
                     onClick={addExperience}
-                    className="px-2.5 py-1 bg-[#18181b] text-white rounded text-[11px] font-bold flex items-center gap-1 hover:bg-black"
+                    className="sketch-btn-white px-3 py-1.5 text-[11px] font-bold flex items-center gap-1.5 hover:bg-[#ffe4e6] cursor-pointer"
                   >
-                    <Plus className="w-3 h-3" /> Add Role
+                    <Plus className="w-3.5 h-3.5 text-[#e11d48]" /> Add Role
                   </button>
                 </div>
 
                 {resume.sections.experience.map((exp, idx) => (
-                  <div key={exp.id || idx} className="p-3.5 rounded-lg border border-[#e4e4e7] bg-[#fafafa] space-y-3">
+                  <div key={exp.id || idx} className="p-4 rounded-xl border-2 border-[#18181b] bg-[#faf8f5] shadow-[2px_2px_0px_#18181b] space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-[11px] font-bold text-[#e11d48]">ROLE #{idx + 1}</span>
+                      <span className="inline-block px-2.5 py-0.5 bg-[#ffe4e6] text-[#e11d48] font-mono font-bold text-[11px] rounded-md border border-[#e11d48]/30">
+                        ROLE #{idx + 1}
+                      </span>
                       <button
                         onClick={() => deleteExperience(exp.id)}
-                        className="text-red-500 hover:text-red-700 p-1"
+                        className="p-1 text-[#e11d48] hover:bg-[#ffe4e6] rounded-md transition-colors cursor-pointer"
                         title="Delete this role"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <input
                         placeholder="Company"
                         value={exp.company}
@@ -547,7 +594,7 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="px-2.5 py-1.5 rounded border border-[#d4d4d8] text-[12px] bg-white"
+                        className="px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white font-bold focus:outline-none focus:border-[#e11d48]"
                       />
                       <input
                         placeholder="Position Title"
@@ -564,11 +611,11 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="px-2.5 py-1.5 rounded border border-[#d4d4d8] text-[12px] bg-white"
+                        className="px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white font-medium focus:outline-none focus:border-[#e11d48]"
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <input
                         placeholder="Dates (e.g. June 2025 – Aug 2025)"
                         value={exp.date}
@@ -584,10 +631,10 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="px-2.5 py-1.5 rounded border border-[#d4d4d8] text-[12px] bg-white"
+                        className="px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white font-mono focus:outline-none focus:border-[#e11d48]"
                       />
                       <input
-                        placeholder="Location"
+                        placeholder="Location (e.g. Remote / Bengaluru)"
                         value={exp.location || ''}
                         onChange={(e) => {
                           const val = e.target.value;
@@ -601,13 +648,13 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="px-2.5 py-1.5 rounded border border-[#d4d4d8] text-[12px] bg-white"
+                        className="px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-mono text-[#71717a] mb-1">
-                        BULLET POINTS &amp; ACHIEVEMENTS (Use • for bullet points)
+                      <label className="block text-[11px] font-mono font-bold text-[#71717a] mb-1">
+                        BULLET POINTS &amp; ACHIEVEMENTS (Use • for bullets)
                       </label>
                       <textarea
                         rows={4}
@@ -624,7 +671,8 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="w-full px-2.5 py-1.5 rounded border border-[#d4d4d8] text-[12px] bg-white"
+                        placeholder="• Architected backend microservices using Node.js and TypeScript, decreasing response time by 35%."
+                        className="w-full px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white focus:outline-none focus:border-[#e11d48] leading-relaxed"
                       />
                     </div>
                   </div>
@@ -635,25 +683,30 @@ export default function ResumeBuilder() {
             {/* TAB: EDUCATION */}
             {activeTab === 'education' && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-[15px] text-[#18181b]">Education &amp; Academics</h3>
+                <div className="flex items-center justify-between border-b-2 border-[#18181b] pb-2">
+                  <h3 className="font-extrabold text-[15px] text-[#18181b] flex items-center gap-2">
+                    <GraduationCap className="w-4 h-4 text-[#e11d48]" />
+                    <span>Education &amp; Academics</span>
+                  </h3>
                   <button
                     onClick={addEducation}
-                    className="px-2.5 py-1 bg-[#18181b] text-white rounded text-[11px] font-bold flex items-center gap-1 hover:bg-black"
+                    className="sketch-btn-white px-3 py-1.5 text-[11px] font-bold flex items-center gap-1.5 hover:bg-[#ffe4e6] cursor-pointer"
                   >
-                    <Plus className="w-3 h-3" /> Add Degree
+                    <Plus className="w-3.5 h-3.5 text-[#e11d48]" /> Add Degree
                   </button>
                 </div>
 
                 {resume.sections.education.map((edu, idx) => (
-                  <div key={edu.id || idx} className="p-3.5 rounded-lg border border-[#e4e4e7] bg-[#fafafa] space-y-3">
+                  <div key={edu.id || idx} className="p-4 rounded-xl border-2 border-[#18181b] bg-[#faf8f5] shadow-[2px_2px_0px_#18181b] space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-[11px] font-bold text-[#e11d48]">ENTRY #{idx + 1}</span>
+                      <span className="inline-block px-2.5 py-0.5 bg-[#ffe4e6] text-[#e11d48] font-mono font-bold text-[11px] rounded-md border border-[#e11d48]/30">
+                        DEGREE #{idx + 1}
+                      </span>
                       <button
                         onClick={() => deleteEducation(edu.id)}
-                        className="text-red-500 hover:text-red-700 p-1"
+                        className="p-1 text-[#e11d48] hover:bg-[#ffe4e6] rounded-md transition-colors cursor-pointer"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
 
@@ -672,12 +725,12 @@ export default function ResumeBuilder() {
                           },
                         }));
                       }}
-                      className="w-full px-2.5 py-1.5 rounded border border-[#d4d4d8] text-[12px] bg-white"
+                      className="w-full px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white font-bold focus:outline-none focus:border-[#e11d48]"
                     />
 
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <input
-                        placeholder="Degree (e.g. B.Tech / B.S.)"
+                        placeholder="Degree (e.g. B.Tech in CSE)"
                         value={edu.degree}
                         onChange={(e) => {
                           const val = e.target.value;
@@ -691,10 +744,10 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="px-2.5 py-1.5 rounded border border-[#d4d4d8] text-[12px] bg-white"
+                        className="px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
                       />
                       <input
-                        placeholder="GPA / Score"
+                        placeholder="GPA / Score (e.g. 8.8 CGPA)"
                         value={edu.score || ''}
                         onChange={(e) => {
                           const val = e.target.value;
@@ -708,12 +761,12 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="px-2.5 py-1.5 rounded border border-[#d4d4d8] text-[12px] bg-white"
+                        className="px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
                       />
                     </div>
 
                     <input
-                      placeholder="Graduation Year / Dates"
+                      placeholder="Graduation Year / Dates (e.g. 2022 – 2026)"
                       value={edu.date}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -727,7 +780,7 @@ export default function ResumeBuilder() {
                           },
                         }));
                       }}
-                      className="w-full px-2.5 py-1.5 rounded border border-[#d4d4d8] text-[12px] bg-white"
+                      className="w-full px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white font-mono focus:outline-none focus:border-[#e11d48]"
                     />
                   </div>
                 ))}
@@ -737,7 +790,15 @@ export default function ResumeBuilder() {
             {/* TAB: SKILLS */}
             {activeTab === 'skills' && (
               <div className="space-y-4">
-                <h3 className="font-bold text-[15px] text-[#18181b]">Technical Skills Categorization</h3>
+                <div className="flex items-center justify-between border-b-2 border-[#18181b] pb-2">
+                  <h3 className="font-extrabold text-[15px] text-[#18181b] flex items-center gap-2">
+                    <Code2 className="w-4 h-4 text-[#e11d48]" />
+                    <span>Technical Skills Matrix</span>
+                  </h3>
+                  <Link to="/skills" className="font-hand text-[15px] text-[#e11d48] font-bold hover:underline">
+                    → Sync with Skill Tracker
+                  </Link>
+                </div>
 
                 <div className="flex gap-2">
                   <input
@@ -745,20 +806,20 @@ export default function ResumeBuilder() {
                     value={newSkillGroup}
                     onChange={(e) => setNewSkillGroup(e.target.value)}
                     placeholder="New Skill Group (e.g. DevOps & Cloud)"
-                    className="flex-1 px-3 py-1.5 rounded border border-[#d4d4d8] text-[12px]"
+                    className="flex-1 px-3.5 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
                   />
                   <button
                     onClick={addSkillGroup}
-                    className="px-3 py-1.5 bg-[#18181b] text-white rounded text-[12px] font-bold hover:bg-black"
+                    className="sketch-btn-red px-4 py-2 text-[12px] font-bold text-white cursor-pointer"
                   >
                     Add Group
                   </button>
                 </div>
 
                 {resume.sections.skills.map((group) => (
-                  <div key={group.id} className="p-3.5 rounded-lg border border-[#e4e4e7] bg-[#fafafa] space-y-2.5">
+                  <div key={group.id} className="p-4 rounded-xl border-2 border-[#18181b] bg-[#faf8f5] shadow-[2px_2px_0px_#18181b] space-y-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-[13px] text-[#18181b]">{group.name}</span>
+                      <span className="font-extrabold text-[13px] text-[#18181b]">{group.name}</span>
                       <button
                         onClick={() =>
                           setResume((prev) => ({
@@ -769,23 +830,23 @@ export default function ResumeBuilder() {
                             },
                           }))
                         }
-                        className="text-red-500 hover:text-red-700 p-1"
+                        className="p-1 text-[#e11d48] hover:bg-[#ffe4e6] rounded-md transition-colors cursor-pointer"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
 
                     {/* Chips */}
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-2">
                       {group.keywords.map((kw, i) => (
                         <span
                           key={i}
-                          className="px-2 py-0.5 bg-white border border-[#d4d4d8] rounded text-[11px] font-medium text-[#18181b] flex items-center gap-1"
+                          className="px-2.5 py-1 bg-white border-2 border-[#18181b] rounded-lg text-[11px] font-bold text-[#141416] shadow-[1px_1px_0px_#18181b] flex items-center gap-1.5"
                         >
                           {kw}
                           <button
                             onClick={() => removeKeywordFromSkill(group.id, kw)}
-                            className="text-[#a1a1aa] hover:text-red-500 ml-0.5"
+                            className="text-[#a1a1aa] hover:text-[#e11d48] font-black ml-0.5 cursor-pointer"
                           >
                             ×
                           </button>
@@ -794,20 +855,20 @@ export default function ResumeBuilder() {
                     </div>
 
                     {/* Add Keyword to Group */}
-                    <div className="flex gap-1.5 pt-1">
+                    <div className="flex gap-2 pt-1">
                       <input
                         type="text"
                         value={newSkillTag[group.id] || ''}
                         onChange={(e) => setNewSkillTag({ ...newSkillTag, [group.id]: e.target.value })}
                         onKeyDown={(e) => e.key === 'Enter' && addKeywordToSkill(group.id)}
                         placeholder="Add skill tag (press Enter)..."
-                        className="flex-1 px-2.5 py-1 text-[11px] rounded border border-[#d4d4d8] bg-white"
+                        className="flex-1 px-3 py-1.5 text-[11px] rounded-lg border-2 border-[#18181b] bg-white focus:outline-none focus:border-[#e11d48]"
                       />
                       <button
                         onClick={() => addKeywordToSkill(group.id)}
-                        className="px-2.5 py-1 bg-[#e11d48] text-white rounded text-[11px] font-bold"
+                        className="sketch-btn-white px-3 py-1 text-[11px] font-bold hover:bg-[#ffe4e6] cursor-pointer"
                       >
-                        Add
+                        Add Tag
                       </button>
                     </div>
                   </div>
@@ -818,26 +879,34 @@ export default function ResumeBuilder() {
             {/* TAB: PROJECTS */}
             {activeTab === 'projects' && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-[15px] text-[#18181b]">Key Technical Projects</h3>
+                <div className="flex items-center justify-between border-b-2 border-[#18181b] pb-2">
+                  <h3 className="font-extrabold text-[15px] text-[#18181b] flex items-center gap-2">
+                    <FolderGit2 className="w-4 h-4 text-[#e11d48]" />
+                    <span>Key Technical Projects</span>
+                  </h3>
                   <button
                     onClick={addProject}
-                    className="px-2.5 py-1 bg-[#18181b] text-white rounded text-[11px] font-bold flex items-center gap-1 hover:bg-black"
+                    className="sketch-btn-white px-3 py-1.5 text-[11px] font-bold flex items-center gap-1.5 hover:bg-[#ffe4e6] cursor-pointer"
                   >
-                    <Plus className="w-3 h-3" /> Add Project
+                    <Plus className="w-3.5 h-3.5 text-[#e11d48]" /> Add Project
                   </button>
                 </div>
 
                 {resume.sections.projects.map((proj, idx) => (
-                  <div key={proj.id || idx} className="p-3.5 rounded-lg border border-[#e4e4e7] bg-[#fafafa] space-y-2.5">
+                  <div key={proj.id || idx} className="p-4 rounded-xl border-2 border-[#18181b] bg-[#faf8f5] shadow-[2px_2px_0px_#18181b] space-y-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-[11px] font-bold text-[#e11d48]">PROJECT #{idx + 1}</span>
-                      <button onClick={() => deleteProject(proj.id)} className="text-red-500 hover:text-red-700 p-1">
-                        <Trash2 className="w-3.5 h-3.5" />
+                      <span className="inline-block px-2.5 py-0.5 bg-[#ffe4e6] text-[#e11d48] font-mono font-bold text-[11px] rounded-md border border-[#e11d48]/30">
+                        PROJECT #{idx + 1}
+                      </span>
+                      <button
+                        onClick={() => deleteProject(proj.id)}
+                        className="p-1 text-[#e11d48] hover:bg-[#ffe4e6] rounded-md transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <input
                         placeholder="Project Name"
                         value={proj.name}
@@ -853,7 +922,7 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="px-2.5 py-1.5 rounded border border-[#d4d4d8] text-[12px] bg-white font-semibold"
+                        className="px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white font-bold focus:outline-none focus:border-[#e11d48]"
                       />
                       <input
                         placeholder="GitHub / Live Demo Link"
@@ -870,13 +939,13 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="px-2.5 py-1.5 rounded border border-[#d4d4d8] text-[12px] bg-white"
+                        className="px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
                       />
                     </div>
 
                     <textarea
                       rows={3}
-                      placeholder="Architecture & impact description..."
+                      placeholder="Architecture & impact description (e.g. Built high-concurrency event ingestion pipeline)..."
                       value={proj.description}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -890,11 +959,11 @@ export default function ResumeBuilder() {
                           },
                         }));
                       }}
-                      className="w-full px-2.5 py-1.5 rounded border border-[#d4d4d8] text-[12px] bg-white"
+                      className="w-full px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white focus:outline-none focus:border-[#e11d48] leading-relaxed"
                     />
 
                     <input
-                      placeholder="Tech keywords comma-separated (e.g. Go, Redis, Docker)"
+                      placeholder="Tech keywords comma-separated (e.g. Go, Redis, Docker, gRPC)"
                       value={proj.keywords.join(', ')}
                       onChange={(e) => {
                         const arr = e.target.value.split(',').map((s) => s.trim()).filter(Boolean);
@@ -908,7 +977,7 @@ export default function ResumeBuilder() {
                           },
                         }));
                       }}
-                      className="w-full px-2.5 py-1 text-[11px] rounded border border-[#d4d4d8] bg-white font-mono"
+                      className="w-full px-3 py-1.5 text-[11px] rounded-xl border-2 border-[#18181b] bg-white font-mono focus:outline-none focus:border-[#e11d48]"
                     />
                   </div>
                 ))}
@@ -918,12 +987,17 @@ export default function ResumeBuilder() {
             {/* TAB: HONORS */}
             {activeTab === 'awards' && (
               <div className="space-y-4">
-                <h3 className="font-bold text-[15px] text-[#18181b]">Certifications &amp; Honors</h3>
+                <div className="flex items-center justify-between border-b-2 border-[#18181b] pb-2">
+                  <h3 className="font-extrabold text-[15px] text-[#18181b] flex items-center gap-2">
+                    <Award className="w-4 h-4 text-[#e11d48]" />
+                    <span>Certifications &amp; Honors</span>
+                  </h3>
+                </div>
 
                 <div>
-                  <label className="block text-[11px] font-mono text-[#71717a] mb-1">CERTIFICATIONS</label>
+                  <label className="block text-[11px] font-mono font-bold text-[#71717a] mb-2 uppercase">CERTIFICATIONS</label>
                   {resume.sections.certifications.map((c, i) => (
-                    <div key={i} className="flex gap-2 mb-2">
+                    <div key={i} className="flex gap-2 mb-2.5">
                       <input
                         value={c.name}
                         placeholder="Certificate Title"
@@ -939,7 +1013,7 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="flex-1 px-2.5 py-1.5 rounded border border-[#d4d4d8] text-[12px]"
+                        className="flex-1 px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white font-medium focus:outline-none focus:border-[#e11d48]"
                       />
                       <input
                         value={c.issuer}
@@ -956,7 +1030,7 @@ export default function ResumeBuilder() {
                             },
                           }));
                         }}
-                        className="w-1/3 px-2.5 py-1.5 rounded border border-[#d4d4d8] text-[12px]"
+                        className="w-1/3 px-3 py-2 rounded-xl border-2 border-[#18181b] text-[12px] bg-white focus:outline-none focus:border-[#e11d48]"
                       />
                     </div>
                   ))}
@@ -966,16 +1040,21 @@ export default function ResumeBuilder() {
 
             {/* TAB: STYLE / THEME */}
             {activeTab === 'style' && (
-              <div className="space-y-4">
-                <h3 className="font-bold text-[15px] text-[#18181b]">Template &amp; Formatting</h3>
+              <div className="space-y-5">
+                <div className="flex items-center justify-between border-b-2 border-[#18181b] pb-2">
+                  <h3 className="font-extrabold text-[15px] text-[#18181b] flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[#e11d48]" />
+                    <span>Template Design &amp; Typography</span>
+                  </h3>
+                </div>
 
                 <div>
-                  <label className="block text-[11px] font-mono text-[#71717a] mb-2">TEMPLATE DESIGN</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <label className="block text-[11px] font-mono font-bold text-[#71717a] mb-2 uppercase">TEMPLATE DESIGN</label>
+                  <div className="grid grid-cols-2 gap-2.5">
                     {[
-                      { id: 'modern', name: 'Modern Clean' },
-                      { id: 'classic', name: 'Classic ATS' },
-                      { id: 'minimal', name: 'Tech Minimal' },
+                      { id: 'modern', name: 'Modern Editorial' },
+                      { id: 'classic', name: 'Classic ATS Tech' },
+                      { id: 'minimal', name: 'Silicon Minimal' },
                       { id: 'executive', name: 'Executive Dark' },
                     ].map((tpl) => (
                       <button
@@ -986,10 +1065,10 @@ export default function ResumeBuilder() {
                             metadata: { ...resume.metadata, template: tpl.id as 'modern' | 'classic' | 'minimal' | 'executive' },
                           })
                         }
-                        className={`p-3 rounded-lg border text-left text-[12px] font-bold transition-all ${
+                        className={`p-3 rounded-xl border-2 text-left text-[12px] font-bold transition-all cursor-pointer ${
                           resume.metadata.template === tpl.id
-                            ? 'border-[#e11d48] bg-[#fef2f2] text-[#e11d48]'
-                            : 'border-[#d4d4d8] bg-white text-[#18181b]'
+                            ? 'border-[#18181b] bg-[#ffe4e6] text-[#e11d48] shadow-[3px_3px_0px_#18181b]'
+                            : 'border-[#18181b] bg-white text-[#18181b] shadow-[1px_1px_0px_#18181b] hover:shadow-[3px_3px_0px_#18181b]'
                         }`}
                       >
                         {tpl.name}
@@ -999,9 +1078,9 @@ export default function ResumeBuilder() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-mono text-[#71717a] mb-2">PRIMARY ACCENT COLOR</label>
-                  <div className="flex gap-2">
-                    {['#0066cc', '#e11d48', '#059669', '#7c3aed', '#18181b'].map((color) => (
+                  <label className="block text-[11px] font-mono font-bold text-[#71717a] mb-2 uppercase">PRIMARY ACCENT COLOR</label>
+                  <div className="flex gap-3">
+                    {['#e11d48', '#18181b', '#0066cc', '#059669', '#7c3aed'].map((color) => (
                       <button
                         key={color}
                         onClick={() =>
@@ -1010,10 +1089,11 @@ export default function ResumeBuilder() {
                             metadata: { ...resume.metadata, themeColor: color },
                           })
                         }
-                        className={`w-8 h-8 rounded-full border-2 transition-transform ${
-                          resume.metadata.themeColor === color ? 'scale-110 border-black' : 'border-transparent'
+                        className={`w-9 h-9 rounded-full border-2 border-[#18181b] shadow-[2px_2px_0px_#18181b] transition-transform cursor-pointer ${
+                          resume.metadata.themeColor === color ? 'scale-115 ring-2 ring-[#18181b] ring-offset-2' : ''
                         }`}
                         style={{ backgroundColor: color }}
+                        title={color}
                       />
                     ))}
                   </div>
@@ -1026,11 +1106,22 @@ export default function ResumeBuilder() {
         {/* =========================================================
             RIGHT COLUMN: REAL-TIME A4 LIVE RESUME PREVIEW
         ========================================================= */}
-        <div className="lg:col-span-7 flex justify-center">
+        <div className="lg:col-span-7 flex flex-col items-center">
+          {/* Top Preview Controls / Badge */}
+          <div className="no-print w-full max-w-[820px] flex items-center justify-between pb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white sketch-border-sm text-[12px] font-bold text-[#141416]">
+              <Flame className="w-3.5 h-3.5 text-[#e11d48]" />
+              <span>Campus Placement Simulator · Reactive Resume Engine</span>
+            </div>
+            <span className="hidden sm:inline font-hand text-[15px] text-[#e11d48] font-bold transform -rotate-1">
+              ✨ Real-Time ATS Rendered Preview
+            </span>
+          </div>
+
           {/* Printable A4 Container */}
           <div
             id="resume-printable"
-            className="w-full max-w-[800px] bg-white rounded-[12px] border border-[#e4e4e7] p-8 sm:p-12 shadow-md transition-all text-[#1d1d1f]"
+            className="w-full max-w-[820px] bg-white rounded-2xl border-2 border-[#18181b] shadow-[6px_6px_0px_#18181b] p-8 sm:p-12 transition-all text-[#1d1d1f]"
             style={{ minHeight: '1050px' }}
           >
             {/* 1. Header & Contact Details */}
@@ -1042,21 +1133,21 @@ export default function ResumeBuilder() {
                 borderColor:
                   resume.metadata.template === 'classic'
                     ? '#18181b'
-                    : resume.metadata.themeColor || '#0066cc',
+                    : resume.metadata.themeColor || '#e11d48',
               }}
             >
-              <h1 className="text-[26px] sm:text-[30px] font-bold tracking-tight text-[#18181b]">
+              <h1 className="text-[26px] sm:text-[30px] font-extrabold tracking-tight text-[#18181b]">
                 {resume.basics.name || 'Your Full Name'}
               </h1>
               <p
-                className="text-[14px] sm:text-[15px] font-medium mt-0.5"
-                style={{ color: resume.metadata.themeColor || '#0066cc' }}
+                className="text-[14px] sm:text-[15px] font-bold mt-0.5"
+                style={{ color: resume.metadata.themeColor || '#e11d48' }}
               >
                 {resume.basics.headline || 'Full-Stack Software Engineer'}
               </p>
 
               {/* Contact Icons Row */}
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-[#52525b] mt-2.5 font-sans">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-[#52525b] mt-2.5 font-sans font-medium">
                 {resume.basics.email && (
                   <span className="flex items-center gap-1">
                     <Mail className="w-3 h-3 text-[#71717a]" />
@@ -1101,7 +1192,7 @@ export default function ResumeBuilder() {
               <div className="mt-4">
                 <h4
                   className="text-[12px] font-bold tracking-wider uppercase font-mono mb-1.5"
-                  style={{ color: resume.metadata.themeColor || '#0066cc' }}
+                  style={{ color: resume.metadata.themeColor || '#e11d48' }}
                 >
                   Summary
                 </h4>
@@ -1116,7 +1207,7 @@ export default function ResumeBuilder() {
               <div className="mt-4">
                 <h4
                   className="text-[12px] font-bold tracking-wider uppercase font-mono mb-2"
-                  style={{ color: resume.metadata.themeColor || '#0066cc' }}
+                  style={{ color: resume.metadata.themeColor || '#e11d48' }}
                 >
                   Education
                 </h4>
@@ -1141,7 +1232,7 @@ export default function ResumeBuilder() {
               <div className="mt-5">
                 <h4
                   className="text-[12px] font-bold tracking-wider uppercase font-mono mb-2"
-                  style={{ color: resume.metadata.themeColor || '#0066cc' }}
+                  style={{ color: resume.metadata.themeColor || '#e11d48' }}
                 >
                   Experience
                 </h4>
@@ -1171,7 +1262,7 @@ export default function ResumeBuilder() {
               <div className="mt-5">
                 <h4
                   className="text-[12px] font-bold tracking-wider uppercase font-mono mb-2"
-                  style={{ color: resume.metadata.themeColor || '#0066cc' }}
+                  style={{ color: resume.metadata.themeColor || '#e11d48' }}
                 >
                   Key Projects
                 </h4>
@@ -1200,7 +1291,7 @@ export default function ResumeBuilder() {
               <div className="mt-5">
                 <h4
                   className="text-[12px] font-bold tracking-wider uppercase font-mono mb-2"
-                  style={{ color: resume.metadata.themeColor || '#0066cc' }}
+                  style={{ color: resume.metadata.themeColor || '#e11d48' }}
                 >
                   Technical Skills
                 </h4>
@@ -1220,7 +1311,7 @@ export default function ResumeBuilder() {
               <div className="mt-5 pt-2 border-t border-[#f4f4f5]">
                 <h4
                   className="text-[12px] font-bold tracking-wider uppercase font-mono mb-1.5"
-                  style={{ color: resume.metadata.themeColor || '#0066cc' }}
+                  style={{ color: resume.metadata.themeColor || '#e11d48' }}
                 >
                   Certifications &amp; Honors
                 </h4>
