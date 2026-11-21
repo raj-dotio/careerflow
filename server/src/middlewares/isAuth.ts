@@ -38,4 +38,28 @@ const isAuth = async (
   }
 };
 
+export const optionalAuth = async (
+  req: AuthRequest,
+  _res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const token =
+      req.cookies?.token ||
+      (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')
+        ? req.headers.authorization.split(' ')[1]
+        : undefined);
+
+    if (token) {
+      const secret = process.env.JWT_SECRET || 'careerflow_super_secret_jwt_key_2026';
+      const decoded = jwt.verify(token, secret) as DecodedToken;
+      req.userId = decoded.userId || decoded.id;
+    }
+    next();
+  } catch {
+    // proceed without userId on token error
+    next();
+  }
+};
+
 export default isAuth;

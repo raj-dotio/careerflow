@@ -326,11 +326,11 @@ export default function Home() {
             to="/"
             className="flex items-center gap-2 hover:opacity-90 transition-opacity shrink-0"
           >
-            <img src={logo2} alt="CareerFlow Logo" className="h-12 sm:h-14 md:h-16 w-auto object-contain" />
+            <img src={logo2} alt="CareerFlow Logo" className="h-14 sm:h-16 md:h-20 w-auto object-contain" />
           </Link>
 
           {/* Central Navigation - Minimal & Spaced Out (No Black Pill BG) */}
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-[13.5px] lg:text-[14px] font-semibold text-[#3f3f46]">
+          <nav className="hidden md:flex items-center gap-7 lg:gap-10 text-[14px] lg:text-[15px] font-semibold text-[#3f3f46]">
             <Link
               to="/builder"
               className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
@@ -345,13 +345,13 @@ export default function Home() {
               <Sparkles className="w-4 h-4 text-[#e11d48]" />
               <span>ATS Diagnostics</span>
             </Link>
-            <a
-              href="#ai-chamber"
+            <Link
+              to="/mock-chamber"
               className="flex items-center gap-2 text-[#e11d48] hover:text-[#be123c] transition-colors whitespace-nowrap font-bold"
             >
               <Bot className="w-4 h-4 text-[#e11d48]" />
               <span>AI Mock Chamber</span>
-            </a>
+            </Link>
             <a
               href="#journey"
               className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
@@ -438,6 +438,15 @@ export default function Home() {
             >
               <Sparkles className="w-4 h-4 text-[#e11d48]" />
               <span>Run Live ATS Checker</span>
+              <ChevronRight className="w-4 h-4 text-[#e11d48]" />
+            </Link>
+
+            <Link
+              to="/mock-chamber"
+              className="sketch-btn-white px-6 py-3.5 text-[16px] flex items-center gap-2 cursor-pointer bg-white border-2 border-[#18181b] hover:bg-[#fff1f2]"
+            >
+              <Bot className="w-4 h-4 text-[#e11d48]" />
+              <span>Enter AI Mock Chamber</span>
               <ChevronRight className="w-4 h-4 text-[#e11d48]" />
             </Link>
           </div>

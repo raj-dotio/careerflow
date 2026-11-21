@@ -67,7 +67,7 @@ interface AtsEvaluationResult {
 }
 
 // Extract text from buffer based on mimetype
-async function extractTextFromFile(buffer: Buffer, mimetype: string, originalname: string): Promise<string> {
+export async function extractTextFromFile(buffer: Buffer, mimetype: string, originalname: string): Promise<string> {
   const ext = path.extname(originalname).toLowerCase();
 
   // DOCX
