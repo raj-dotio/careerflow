@@ -345,6 +345,13 @@ export default function Home() {
               <Sparkles className="w-4 h-4 text-[#e11d48]" />
               <span>ATS Diagnostics</span>
             </Link>
+            <Link
+              to="/skills"
+              className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
+            >
+              <Award className="w-4 h-4 text-[#71717a]" />
+              <span>Skill Tracker</span>
+            </Link>
             <a
               href="#ai-chamber"
               className="flex items-center gap-2 text-[#e11d48] hover:text-[#be123c] transition-colors whitespace-nowrap font-bold"
