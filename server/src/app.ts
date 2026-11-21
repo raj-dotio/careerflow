@@ -10,6 +10,7 @@ import goalRoute from './routes/goalRoute.js';
 import roadmapRoute from './routes/roadmapRoute.js';
 import skillRoute from './routes/skillRoute.js';
 import challengeRoute from './routes/challengeRoute.js';
+import resumeAiRoute from './routes/resumeAi.routes.js';
 
 const app: Application = express();
 
@@ -46,6 +47,7 @@ app.use('/api/goals', goalRoute);
 app.use('/api/roadmap', roadmapRoute);
 app.use('/api/skills', skillRoute);
 app.use('/api/challenges', challengeRoute);
+app.use('/api/resume-ai', resumeAiRoute);
 
 // 404 Not Found Handler
 app.use((req: Request, res: Response) => {

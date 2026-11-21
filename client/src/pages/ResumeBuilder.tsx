@@ -22,13 +22,19 @@ import {
   MapPin,
   ArrowLeft,
   Flame,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { type ResumeData, initialSampleResume } from '../utils/sampleResume';
+import AiResumeChat from '../components/resume/AiResumeChat';
+import { applyResumePatches, type ResumePatchOp } from '../utils/resumePatch';
 import logo2 from '../assets/new2.png';
 
 export default function ResumeBuilder() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'basics' | 'experience' | 'education' | 'skills' | 'projects' | 'awards' | 'style'>('basics');
+  const [editMode, setEditMode] = useState<'ai' | 'manual'>('ai');
+  const [highlightedSection, setHighlightedSection] = useState<string | null>(null);
+  const [mobileView, setMobileView] = useState<'editor' | 'preview'>('editor');
   const [resume, setResume] = useState<ResumeData>(() => {
     const saved = localStorage.getItem('careerflow_active_resume');
     if (saved) {
@@ -40,6 +46,60 @@ export default function ResumeBuilder() {
     }
     return initialSampleResume;
   });
+
+  const [history, setHistory] = useState<ResumeData[]>([resume]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+
+  const pushToHistory = (newResume: ResumeData) => {
+    setHistory((prev) => {
+      const updated = prev.slice(0, historyIndex + 1);
+      return [...updated, JSON.parse(JSON.stringify(newResume))].slice(-30);
+    });
+    setHistoryIndex((prev) => prev + 1);
+  };
+
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      const nextIdx = historyIndex - 1;
+      setHistoryIndex(nextIdx);
+      setResume(JSON.parse(JSON.stringify(history[nextIdx])));
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1) {
+      const nextIdx = historyIndex + 1;
+      setHistoryIndex(nextIdx);
+      setResume(JSON.parse(JSON.stringify(history[nextIdx])));
+    }
+  };
+
+  const handleApplyPatches = (patches: ResumePatchOp[], targetSection?: string) => {
+    const { updated, affectedSections } = applyResumePatches(resume, patches);
+    setResume(updated);
+    pushToHistory(updated);
+
+    const sec = targetSection || Array.from(affectedSections)[0];
+    if (sec) {
+      setHighlightedSection(sec);
+      setTimeout(() => {
+        setHighlightedSection(null);
+      }, 1800);
+
+      const el = document.getElementById(`preview-sec-${sec}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  };
+
+  const handlePreviewSectionClick = (secId: 'basics' | 'experience' | 'education' | 'skills' | 'projects' | 'awards' | 'style') => {
+    setActiveTab(secId);
+    setHighlightedSection(secId);
+    setTimeout(() => {
+      setHighlightedSection(null);
+    }, 1500);
+  };
 
   const [saveStatus, setSaveStatus] = useState<string>('');
   const [newSkillGroup, setNewSkillGroup] = useState('');
@@ -382,20 +442,78 @@ export default function ResumeBuilder() {
           <Flame className="w-3.5 h-3.5 text-[#e11d48]" />
           <span>Campus Placement Simulator · Reactive Resume Engine</span>
         </div>
-        <span className="font-hand text-[16px] text-[#e11d48] font-bold transform -rotate-1">
-          ✨ Live Real-Time ATS Rendered Preview · Auto-Saved
-        </span>
+        <div className="flex items-center gap-3">
+          {/* Mobile View Toggle */}
+          <div className="lg:hidden flex bg-white sketch-border-sm p-0.5">
+            <button
+              onClick={() => setMobileView('editor')}
+              className={`px-3 py-1 text-[11px] font-bold rounded cursor-pointer ${
+                mobileView === 'editor' ? 'bg-[#e11d48] text-white' : 'text-[#71717a]'
+              }`}
+            >
+              {editMode === 'ai' ? '🤖 AI Guide' : '✏️ Form'}
+            </button>
+            <button
+              onClick={() => setMobileView('preview')}
+              className={`px-3 py-1 text-[11px] font-bold rounded cursor-pointer ${
+                mobileView === 'preview' ? 'bg-[#e11d48] text-white' : 'text-[#71717a]'
+              }`}
+            >
+              📄 Preview
+            </button>
+          </div>
+          <span className="font-hand text-[16px] text-[#e11d48] font-bold transform -rotate-1 hidden sm:inline">
+            ✨ Live Real-Time ATS Rendered Preview · Auto-Saved
+          </span>
+        </div>
       </div>
 
       {/* 3. Main Workspace Layout - Left & Right Columns Aligned at Exact Same Level */}
       <div className="max-w-[1500px] mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* =========================================================
-            LEFT COLUMN: SECTION ACCORDION FORM EDITOR (No Print)
+            LEFT COLUMN: AI RESUME GUIDE OR MANUAL ACCORDION FORM (No Print)
             Styled with organic hand-drawn sketch-border like Image 1
         ========================================================= */}
-        <div className="no-print lg:col-span-5 bg-white sketch-border flex flex-col h-[calc(100vh-135px)] lg:sticky lg:top-[85px] overflow-hidden">
-          {/* Section Navigation Tabs with comfortable headroom */}
-          <div className="border-b-2 border-[#18181b] pt-4 pb-2.5 px-4 flex overflow-x-auto gap-2 bg-[#faf8f5] items-center">
+        <div
+          className={`no-print lg:col-span-5 bg-white sketch-border flex flex-col h-[calc(100vh-135px)] lg:sticky lg:top-[85px] overflow-hidden ${
+            mobileView === 'preview' ? 'hidden lg:flex' : 'flex'
+          }`}
+        >
+          {editMode === 'ai' ? (
+            <AiResumeChat
+              resume={resume}
+              onApplyPatches={handleApplyPatches}
+              onJumpToSection={(sec) => setActiveTab(sec)}
+              onSwitchToManual={() => setEditMode('manual')}
+              onUndo={handleUndo}
+              onRedo={handleRedo}
+              canUndo={historyIndex > 0}
+              canRedo={historyIndex < history.length - 1}
+              onDownloadPdf={handlePrint}
+              onCheckAts={handleTestAts}
+              onSave={handleSaveToCloud}
+              onImportParsedResume={(parsed) => {
+                setResume(parsed);
+                pushToHistory(parsed);
+              }}
+            />
+          ) : (
+            <>
+              {/* Manual Mode Header with return to AI button */}
+              <div className="bg-[#fff1f2] border-b-2 border-[#18181b] px-4 py-2 flex items-center justify-between shrink-0">
+                <span className="text-[12px] font-bold text-[#e11d48] flex items-center gap-1.5">
+                  <SlidersHorizontal className="w-3.5 h-3.5" /> Manual Form Controls
+                </span>
+                <button
+                  onClick={() => setEditMode('ai')}
+                  className="sketch-btn-red px-2.5 py-1 text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+                >
+                  <Sparkles className="w-3 h-3" /> Switch to AI Guide
+                </button>
+              </div>
+
+              {/* Section Navigation Tabs with comfortable headroom */}
+              <div className="border-b-2 border-[#18181b] pt-4 pb-2.5 px-4 flex overflow-x-auto gap-2 bg-[#faf8f5] items-center shrink-0">
             {[
               { id: 'basics', label: 'Basics', icon: User },
               { id: 'experience', label: 'Experience', icon: Briefcase },
@@ -1113,6 +1231,8 @@ export default function ResumeBuilder() {
               </div>
             )}
           </div>
+            </>
+          )}
         </div>
 
         {/* =========================================================
@@ -1120,7 +1240,7 @@ export default function ResumeBuilder() {
             Styled with organic hand-drawn sketch-border like Image 1
             Aligned horizontally at the EXACT SAME LEVEL as Left Editor
         ========================================================= */}
-        <div className="lg:col-span-7 flex justify-center">
+        <div className={`lg:col-span-7 flex justify-center ${mobileView === 'editor' ? 'hidden lg:flex' : 'flex'}`}>
           {/* Printable A4 Container with organic hand-drawn sketch-border */}
           <div
             id="resume-printable"
@@ -1129,15 +1249,20 @@ export default function ResumeBuilder() {
           >
             {/* 1. Header & Contact Details */}
             <div
-              className={`pb-4 border-b ${
-                resume.metadata.template === 'minimal' ? 'border-[#e4e4e7]' : 'border-b-2'
-              }`}
+              id="preview-sec-basics"
+              onClick={() => handlePreviewSectionClick('basics')}
+              className={`pb-4 border-b cursor-pointer transition-all duration-700 rounded-lg p-2.5 ${
+                highlightedSection === 'basics'
+                  ? 'ring-2 ring-[#e11d48] bg-rose-50/80 shadow-sm'
+                  : 'hover:bg-zinc-50/60'
+              } ${resume.metadata.template === 'minimal' ? 'border-[#e4e4e7]' : 'border-b-2'}`}
               style={{
                 borderColor:
                   resume.metadata.template === 'classic'
                     ? '#18181b'
                     : resume.metadata.themeColor || '#e11d48',
               }}
+              title="Click to edit Basics in AI Guide"
             >
               <h1 className="text-[26px] sm:text-[30px] font-extrabold tracking-tight text-[#18181b]">
                 {resume.basics.name || 'Your Full Name'}
@@ -1191,8 +1316,17 @@ export default function ResumeBuilder() {
             </div>
 
             {/* 2. Professional Summary */}
-            {resume.summary && (
-              <div className="mt-4">
+            {resume.summary ? (
+              <div
+                id="preview-sec-summary"
+                onClick={() => handlePreviewSectionClick('basics')}
+                className={`mt-4 cursor-pointer transition-all duration-700 rounded-lg p-2.5 ${
+                  highlightedSection === 'summary'
+                    ? 'ring-2 ring-[#e11d48] bg-rose-50/80 shadow-sm'
+                    : 'hover:bg-zinc-50/60'
+                }`}
+                title="Click to edit Summary in AI Guide"
+              >
                 <h4
                   className="text-[12px] font-bold tracking-wider uppercase font-mono mb-1.5"
                   style={{ color: resume.metadata.themeColor || '#e11d48' }}
@@ -1203,11 +1337,36 @@ export default function ResumeBuilder() {
                   {resume.summary}
                 </p>
               </div>
+            ) : (
+              <div
+                id="preview-sec-summary"
+                onClick={() => handlePreviewSectionClick('basics')}
+                className="mt-4 p-3 border border-dashed border-zinc-200 rounded-lg text-zinc-400 hover:bg-rose-50/30 hover:border-[#e11d48]/40 transition-all cursor-pointer"
+                title="Click to generate summary with AI"
+              >
+                <div className="flex items-center justify-between text-[11px] font-mono font-bold uppercase text-zinc-400">
+                  <span>Professional Summary</span>
+                  <span className="text-[10px] text-[#e11d48] font-sans">AI summary appears here +</span>
+                </div>
+                <div className="mt-1.5 space-y-1 opacity-40">
+                  <div className="h-2 bg-zinc-200 rounded w-full"></div>
+                  <div className="h-2 bg-zinc-200 rounded w-4/5"></div>
+                </div>
+              </div>
             )}
 
             {/* 3. Education Section */}
-            {resume.sections.education.length > 0 && (
-              <div className="mt-4">
+            {resume.sections.education.length > 0 ? (
+              <div
+                id="preview-sec-education"
+                onClick={() => handlePreviewSectionClick('education')}
+                className={`mt-4 cursor-pointer transition-all duration-700 rounded-lg p-2.5 ${
+                  highlightedSection === 'education'
+                    ? 'ring-2 ring-[#e11d48] bg-rose-50/80 shadow-sm'
+                    : 'hover:bg-zinc-50/60'
+                }`}
+                title="Click to edit Education in AI Guide"
+              >
                 <h4
                   className="text-[12px] font-bold tracking-wider uppercase font-mono mb-2"
                   style={{ color: resume.metadata.themeColor || '#e11d48' }}
@@ -1228,11 +1387,36 @@ export default function ResumeBuilder() {
                   ))}
                 </div>
               </div>
+            ) : (
+              <div
+                id="preview-sec-education"
+                onClick={() => handlePreviewSectionClick('education')}
+                className="mt-4 p-3 border border-dashed border-zinc-200 rounded-lg text-zinc-400 hover:bg-rose-50/30 hover:border-[#e11d48]/40 transition-all cursor-pointer"
+                title="Click to add Education with AI"
+              >
+                <div className="flex items-center justify-between text-[11px] font-mono font-bold uppercase text-zinc-400">
+                  <span>Education &amp; Academics</span>
+                  <span className="text-[10px] text-[#e11d48] font-sans">Add degree via AI guide +</span>
+                </div>
+                <div className="mt-1.5 space-y-1 opacity-40">
+                  <div className="h-2.5 bg-zinc-200 rounded w-1/3"></div>
+                  <div className="h-2 bg-zinc-200 rounded w-2/3"></div>
+                </div>
+              </div>
             )}
 
             {/* 4. Experience Section */}
-            {resume.sections.experience.length > 0 && (
-              <div className="mt-5">
+            {resume.sections.experience.length > 0 ? (
+              <div
+                id="preview-sec-experience"
+                onClick={() => handlePreviewSectionClick('experience')}
+                className={`mt-5 cursor-pointer transition-all duration-700 rounded-lg p-2.5 ${
+                  highlightedSection === 'experience'
+                    ? 'ring-2 ring-[#e11d48] bg-rose-50/80 shadow-sm'
+                    : 'hover:bg-zinc-50/60'
+                }`}
+                title="Click to edit Experience in AI Guide"
+              >
                 <h4
                   className="text-[12px] font-bold tracking-wider uppercase font-mono mb-2"
                   style={{ color: resume.metadata.themeColor || '#e11d48' }}
@@ -1258,11 +1442,37 @@ export default function ResumeBuilder() {
                   ))}
                 </div>
               </div>
+            ) : (
+              <div
+                id="preview-sec-experience"
+                onClick={() => handlePreviewSectionClick('experience')}
+                className="mt-4 p-3 border border-dashed border-zinc-200 rounded-lg text-zinc-400 hover:bg-rose-50/30 hover:border-[#e11d48]/40 transition-all cursor-pointer"
+                title="Click to add Experience with AI"
+              >
+                <div className="flex items-center justify-between text-[11px] font-mono font-bold uppercase text-zinc-400">
+                  <span>Work Experience</span>
+                  <span className="text-[10px] text-[#e11d48] font-sans">Add experience via AI guide +</span>
+                </div>
+                <div className="mt-1.5 space-y-1 opacity-40">
+                  <div className="h-2.5 bg-zinc-200 rounded w-2/5"></div>
+                  <div className="h-2 bg-zinc-200 rounded w-full"></div>
+                  <div className="h-2 bg-zinc-200 rounded w-3/4"></div>
+                </div>
+              </div>
             )}
 
             {/* 5. Projects Section */}
-            {resume.sections.projects.length > 0 && (
-              <div className="mt-5">
+            {resume.sections.projects.length > 0 ? (
+              <div
+                id="preview-sec-projects"
+                onClick={() => handlePreviewSectionClick('projects')}
+                className={`mt-5 cursor-pointer transition-all duration-700 rounded-lg p-2.5 ${
+                  highlightedSection === 'projects'
+                    ? 'ring-2 ring-[#e11d48] bg-rose-50/80 shadow-sm'
+                    : 'hover:bg-zinc-50/60'
+                }`}
+                title="Click to edit Projects in AI Guide"
+              >
                 <h4
                   className="text-[12px] font-bold tracking-wider uppercase font-mono mb-2"
                   style={{ color: resume.metadata.themeColor || '#e11d48' }}
@@ -1287,11 +1497,36 @@ export default function ResumeBuilder() {
                   ))}
                 </div>
               </div>
+            ) : (
+              <div
+                id="preview-sec-projects"
+                onClick={() => handlePreviewSectionClick('projects')}
+                className="mt-4 p-3 border border-dashed border-zinc-200 rounded-lg text-zinc-400 hover:bg-rose-50/30 hover:border-[#e11d48]/40 transition-all cursor-pointer"
+                title="Click to add Projects with AI"
+              >
+                <div className="flex items-center justify-between text-[11px] font-mono font-bold uppercase text-zinc-400">
+                  <span>Key Technical Projects</span>
+                  <span className="text-[10px] text-[#e11d48] font-sans">Add project via AI guide +</span>
+                </div>
+                <div className="mt-1.5 space-y-1 opacity-40">
+                  <div className="h-2.5 bg-zinc-200 rounded w-1/3"></div>
+                  <div className="h-2 bg-zinc-200 rounded w-full"></div>
+                </div>
+              </div>
             )}
 
             {/* 6. Technical Skills Section */}
-            {resume.sections.skills.length > 0 && (
-              <div className="mt-5">
+            {resume.sections.skills.length > 0 ? (
+              <div
+                id="preview-sec-skills"
+                onClick={() => handlePreviewSectionClick('skills')}
+                className={`mt-5 cursor-pointer transition-all duration-700 rounded-lg p-2.5 ${
+                  highlightedSection === 'skills'
+                    ? 'ring-2 ring-[#e11d48] bg-rose-50/80 shadow-sm'
+                    : 'hover:bg-zinc-50/60'
+                }`}
+                title="Click to edit Skills in AI Guide"
+              >
                 <h4
                   className="text-[12px] font-bold tracking-wider uppercase font-mono mb-2"
                   style={{ color: resume.metadata.themeColor || '#e11d48' }}
@@ -1307,11 +1542,36 @@ export default function ResumeBuilder() {
                   ))}
                 </div>
               </div>
+            ) : (
+              <div
+                id="preview-sec-skills"
+                onClick={() => handlePreviewSectionClick('skills')}
+                className="mt-4 p-3 border border-dashed border-zinc-200 rounded-lg text-zinc-400 hover:bg-rose-50/30 hover:border-[#e11d48]/40 transition-all cursor-pointer"
+                title="Click to add Skills with AI"
+              >
+                <div className="flex items-center justify-between text-[11px] font-mono font-bold uppercase text-zinc-400">
+                  <span>Technical Skills</span>
+                  <span className="text-[10px] text-[#e11d48] font-sans">Add skills via chips +</span>
+                </div>
+                <div className="mt-1.5 space-y-1 opacity-40">
+                  <div className="h-2 bg-zinc-200 rounded w-1/4"></div>
+                  <div className="h-2 bg-zinc-200 rounded w-1/2"></div>
+                </div>
+              </div>
             )}
 
             {/* 7. Awards & Certifications */}
-            {(resume.sections.certifications.length > 0 || resume.sections.awards.length > 0) && (
-              <div className="mt-5 pt-2 border-t border-[#f4f4f5]">
+            {(resume.sections.certifications.length > 0 || resume.sections.awards.length > 0) ? (
+              <div
+                id="preview-sec-awards"
+                onClick={() => handlePreviewSectionClick('awards')}
+                className={`mt-5 pt-2 border-t border-[#f4f4f5] cursor-pointer transition-all duration-700 rounded-lg p-2.5 ${
+                  highlightedSection === 'awards'
+                    ? 'ring-2 ring-[#e11d48] bg-rose-50/80 shadow-sm'
+                    : 'hover:bg-zinc-50/60'
+                }`}
+                title="Click to edit Honors in AI Guide"
+              >
                 <h4
                   className="text-[12px] font-bold tracking-wider uppercase font-mono mb-1.5"
                   style={{ color: resume.metadata.themeColor || '#e11d48' }}
@@ -1333,7 +1593,7 @@ export default function ResumeBuilder() {
                   ))}
                 </div>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
