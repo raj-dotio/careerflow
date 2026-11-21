@@ -112,7 +112,11 @@ export default function ResumeBuilder() {
   }, [resume]);
 
   const handlePrint = () => {
-    window.print();
+    setMobileView('preview');
+    setHighlightedSection(null);
+    setTimeout(() => {
+      window.print();
+    }, 80);
   };
 
   const handleTestAts = () => {
@@ -319,15 +323,40 @@ export default function ResumeBuilder() {
       {/* Print isolation style */}
       <style>{`
         @media print {
-          body {
-            background: white !important;
+          @page {
+            size: A4 portrait;
+            margin: 8mm 10mm;
+          }
+          html, body {
+            background: #ffffff !important;
+            color: #000000 !important;
             padding: 0 !important;
             margin: 0 !important;
+            height: auto !important;
+            min-height: 100% !important;
+            overflow: visible !important;
           }
           .no-print {
             display: none !important;
           }
+          .print-resume-wrapper,
+          div:has(> #resume-printable),
+          div:has(#resume-printable),
+          [class*="col-span"]:has(#resume-printable) {
+            display: block !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            visibility: visible !important;
+            position: static !important;
+          }
           #resume-printable {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
             border: none !important;
             box-shadow: none !important;
             border-radius: 0 !important;
@@ -336,6 +365,22 @@ export default function ResumeBuilder() {
             max-width: 100% !important;
             width: 100% !important;
             min-height: auto !important;
+            background: #ffffff !important;
+            color: #111827 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          #resume-printable * {
+            visibility: visible !important;
+          }
+          #resume-printable .border-dashed {
+            display: none !important;
+          }
+          #resume-printable [class*="ring-"],
+          #resume-printable [class*="bg-rose-"] {
+            background: transparent !important;
+            box-shadow: none !important;
+            outline: none !important;
           }
         }
       `}</style>
@@ -469,7 +514,7 @@ export default function ResumeBuilder() {
       </div>
 
       {/* 3. Main Workspace Layout - Left & Right Columns Aligned at Exact Same Level */}
-      <div className="max-w-[1500px] mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="max-w-[1500px] mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start print:!block print:!p-0 print:!m-0 print:!max-w-none">
         {/* =========================================================
             LEFT COLUMN: AI RESUME GUIDE OR MANUAL ACCORDION FORM (No Print)
             Styled with organic hand-drawn sketch-border like Image 1
@@ -1240,11 +1285,11 @@ export default function ResumeBuilder() {
             Styled with organic hand-drawn sketch-border like Image 1
             Aligned horizontally at the EXACT SAME LEVEL as Left Editor
         ========================================================= */}
-        <div className={`lg:col-span-7 flex justify-center ${mobileView === 'editor' ? 'hidden lg:flex' : 'flex'}`}>
+        <div className={`print-resume-wrapper lg:col-span-7 flex justify-center print:!block print:!w-full print:!m-0 print:!p-0 ${mobileView === 'editor' ? 'hidden lg:flex' : 'flex'}`}>
           {/* Printable A4 Container with organic hand-drawn sketch-border */}
           <div
             id="resume-printable"
-            className="w-full max-w-[820px] bg-white sketch-border p-8 sm:p-12 transition-all text-[#1d1d1f]"
+            className="w-full max-w-[820px] bg-white sketch-border p-8 sm:p-12 transition-all text-[#1d1d1f] print:!p-0 print:!border-none print:!shadow-none print:!m-0 print:!max-w-full print:!w-full"
             style={{ minHeight: '1050px' }}
           >
             {/* 1. Header & Contact Details */}

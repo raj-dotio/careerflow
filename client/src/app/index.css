@@ -183,28 +183,70 @@
 /* Print Styling for A4 Resume Export */
 @media print {
   @page {
-    size: A4;
-    margin: 12mm;
+    size: A4 portrait;
+    margin: 8mm 10mm;
   }
 
-  body {
+  html, body {
     background: #ffffff !important;
     color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
   }
 
   .no-print {
     display: none !important;
   }
 
-  #resume-printable {
-    box-shadow: none !important;
-    border: none !important;
-    border-radius: 0 !important;
+  .print-resume-wrapper,
+  div:has(#resume-printable),
+  div:has(> #resume-printable),
+  [class*="col-span"]:has(#resume-printable) {
+    display: block !important;
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    visibility: visible !important;
+    position: static !important;
+  }
+
+  #resume-printable {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
     background: #ffffff !important;
-    color: #000000 !important;
+    color: #111827 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #resume-printable * {
+    visibility: visible !important;
+  }
+
+  #resume-printable .border-dashed {
+    display: none !important;
+  }
+
+  #resume-printable [class*="ring-"],
+  #resume-printable [class*="bg-rose-"] {
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
   }
 }
