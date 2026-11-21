@@ -393,12 +393,9 @@ export default function ResumeBuilder() {
             LEFT COLUMN: SECTION ACCORDION FORM EDITOR (No Print)
             Styled with organic hand-drawn sketch-border like Image 1
         ========================================================= */}
-        <div
-          className="no-print lg:col-span-5 bg-white sketch-border flex flex-col h-[calc(100vh-135px)] lg:sticky lg:top-[85px] overflow-hidden"
-          style={{ borderRadius: '20px 20px 225px 15px / 20px 20px 15px 255px' }}
-        >
-          {/* Section Navigation Tabs with raised corners and ample headroom */}
-          <div className="border-b-2 border-[#18181b] pt-3.5 pb-2.5 px-4 flex overflow-x-auto gap-2 bg-[#faf8f5] items-center">
+        <div className="no-print lg:col-span-5 bg-white sketch-border flex flex-col h-[calc(100vh-135px)] lg:sticky lg:top-[85px] overflow-hidden">
+          {/* Section Navigation Tabs with comfortable headroom */}
+          <div className="border-b-2 border-[#18181b] pt-4 pb-2.5 px-4 flex overflow-x-auto gap-2 bg-[#faf8f5] items-center">
             {[
               { id: 'basics', label: 'Basics', icon: User },
               { id: 'experience', label: 'Experience', icon: Briefcase },
