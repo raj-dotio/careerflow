@@ -8,6 +8,10 @@ import MockChamberLanding from '../pages/MockChamberLanding';
 import MockChamberRoom from '../pages/MockChamberRoom';
 import MockChamberReport from '../pages/MockChamberReport';
 import RoadmapPage from '../pages/RoadmapPage';
+import SkillTracker from '../pages/SkillTracker';
+import QuickChallengeSetup from '../pages/QuickChallengeSetup';
+import LiveChallenge from '../pages/LiveChallenge';
+import ChallengeResults from '../pages/ChallengeResults';
 
 export const router = createBrowserRouter([
   {
@@ -58,6 +62,26 @@ export const router = createBrowserRouter([
   {
     path: '/roadmap',
     element: <RoadmapPage />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: '/skills',
+    element: <SkillTracker />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: '/challenge/setup',
+    element: <QuickChallengeSetup />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: '/challenge/:id',
+    element: <LiveChallenge />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: '/challenge/:id/results',
+    element: <ChallengeResults />,
     errorElement: <RouteErrorBoundary />,
   },
 ]);

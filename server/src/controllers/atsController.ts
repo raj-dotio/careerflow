@@ -2,8 +2,17 @@ import { Request, Response } from 'express';
 import mammoth from 'mammoth';
 import fs from 'fs';
 import path from 'path';
+import {
+  analyzeResumeWithGemini,
+  type AtsEvaluationResult,
+  type KeywordAnalysis,
+  type BulletRedline,
+  type AtsChecklistItem,
+} from '../services/geminiService.js';
 
-// Core Technical Keywords List
+export type { AtsEvaluationResult, KeywordAnalysis, BulletRedline, AtsChecklistItem };
+
+// Core Technical Keywords List for Algorithmic Fallback
 const TECH_KEYWORDS = [
   'react', 'next.js', 'vue', 'angular', 'typescript', 'javascript', 'html', 'css', 'tailwind',
   'node.js', 'express', 'nestjs', 'go', 'golang', 'python', 'django', 'fastapi', 'c++', 'java', 'spring',
@@ -26,45 +35,6 @@ const WEAK_PHRASES = [
   'worked on', 'helped with', 'responsible for', 'assisted in', 'handled tasks', 'involved in',
   'participated in', 'did development', 'tried to', 'made changes'
 ];
-
-interface KeywordAnalysis {
-  matchedKeywords: string[];
-  missingKeywords: string[];
-  matchRate: number;
-}
-
-interface BulletRedline {
-  original: string;
-  suggested: string;
-  reason: string;
-}
-
-interface AtsEvaluationResult {
-  overallScore: number;
-  rating: 'Exceptional' | 'Competitive' | 'Needs Improvement' | 'Critical Issues';
-  summaryFeedback: string;
-  scores: {
-    keywordMatch: number;
-    quantifiableImpact: number;
-    structureAndFormat: number;
-    readabilityAndLength: number;
-  };
-  metrics: {
-    wordCount: number;
-    bulletCount: number;
-    metricBulletCount: number;
-    actionVerbCount: number;
-    readingTimeMinutes: number;
-  };
-  keywords: KeywordAnalysis;
-  bulletRedlines: BulletRedline[];
-  checklist: Array<{
-    category: string;
-    item: string;
-    passed: boolean;
-    recommendation?: string;
-  }>;
-}
 
 // Extract text from buffer based on mimetype
 export async function extractTextFromFile(buffer: Buffer, mimetype: string, originalname: string): Promise<string> {
@@ -104,8 +74,8 @@ export async function extractTextFromFile(buffer: Buffer, mimetype: string, orig
   return buffer.toString('utf-8');
 }
 
-// Evaluate raw text against ATS standards & Job Description
-export function evaluateResumeText(resumeText: string, jobDescription?: string): AtsEvaluationResult {
+// Evaluate raw text against ATS standards & Job Description using local deterministic heuristics
+export function evaluateResumeTextLocally(resumeText: string, jobDescription?: string): AtsEvaluationResult {
   const lowerText = resumeText.toLowerCase();
   const words = resumeText.trim().split(/\s+/).filter(w => w.length > 0);
   const wordCount = words.length;
@@ -190,7 +160,6 @@ export function evaluateResumeText(resumeText: string, jobDescription?: string):
   if (hasProjects) structureScore += 5;
 
   // 4. Readability & Length Score
-  // Ideal single-page tech resume: 450 - 900 words
   let readabilityScore = 85;
   if (wordCount < 250) readabilityScore -= 30;
   else if (wordCount < 400) readabilityScore -= 15;
@@ -227,7 +196,7 @@ export function evaluateResumeText(resumeText: string, jobDescription?: string):
     summaryFeedback = 'Significant risk of automated ATS rejection. Critical sections or contact details are missing, with insufficient keyword density.';
   }
 
-  const checklist = [
+  const checklist: AtsChecklistItem[] = [
     {
       category: 'Contact Info',
       item: 'Direct Professional Email Address',
@@ -302,7 +271,28 @@ export function evaluateResumeText(resumeText: string, jobDescription?: string):
     },
     bulletRedlines,
     checklist,
+    aiPowered: false,
   };
+}
+
+/**
+ * Main evaluation entry point: Uses Gemini AI from server env when available,
+ * with automatic resilient fallback to the algorithmic engine.
+ */
+export async function evaluateResumeText(
+  resumeText: string,
+  jobDescription?: string
+): Promise<AtsEvaluationResult> {
+  try {
+    const aiResult = await analyzeResumeWithGemini(resumeText, jobDescription);
+    if (aiResult) {
+      return aiResult;
+    }
+  } catch (err) {
+    console.warn('[atsController] Gemini evaluation failed, using fallback:', err);
+  }
+
+  return evaluateResumeTextLocally(resumeText, jobDescription);
 }
 
 // POST /api/ats/analyze
@@ -331,7 +321,7 @@ export const analyzeResume = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    const analysis = evaluateResumeText(fullText, jobDescription);
+    const analysis = await evaluateResumeText(fullText, jobDescription);
 
     res.status(200).json({
       success: true,
@@ -380,7 +370,7 @@ export const uploadAndAnalyze = async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    const analysis = evaluateResumeText(extractedText, jobDescription);
+    const analysis = await evaluateResumeText(extractedText, jobDescription);
 
     res.status(200).json({
       success: true,

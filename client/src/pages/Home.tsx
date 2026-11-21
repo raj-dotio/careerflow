@@ -360,19 +360,26 @@ export default function Home() {
               <span>Daily Streaks</span>
             </Link>
             <Link
+              to="/skills"
+              className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
+            >
+              <Award className="w-4 h-4 text-[#71717a]" />
+              <span>Skill Tracker</span>
+            </Link>
+            <Link
               to="/mock-chamber"
               className="flex items-center gap-2 text-[#e11d48] hover:text-[#be123c] transition-colors whitespace-nowrap font-bold"
             >
               <Bot className="w-4 h-4 text-[#e11d48]" />
               <span>AI Mock Chamber</span>
             </Link>
-            <a
-              href="#student-quiz"
+            <Link
+              to="/challenge/setup"
               className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
             >
               <Zap className="w-4 h-4 text-[#71717a]" />
               <span>Quick Challenge</span>
-            </a>
+            </Link>
           </nav>
 
           {/* Balanced right spacer matching logo size for clean centering */}

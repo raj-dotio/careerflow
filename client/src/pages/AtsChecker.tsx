@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   FileCheck,
@@ -10,6 +10,10 @@ import {
   GraduationCap,
   Check,
   Copy,
+  Sparkles,
+  Cpu,
+  Award,
+  Zap,
 } from 'lucide-react';
 import { initialSampleResume } from '../utils/sampleResume';
 
@@ -46,6 +50,8 @@ interface AtsResult {
     passed: boolean;
     recommendation?: string;
   }>;
+  aiPowered?: boolean;
+  modelUsed?: string;
 }
 
 const JOB_PRESETS = [
@@ -69,6 +75,13 @@ const JOB_PRESETS = [
     title: 'Full-Stack Software Engineer',
     keywords: 'React, TypeScript, Node.js, Next.js, Express, PostgreSQL, MongoDB, RESTful API, Tailwind CSS, Git, Docker, automated testing',
   },
+];
+
+const SCAN_STAGES = [
+  'Reverse-Engineering ATS Parsers...',
+  'Gemini AI analyzing semantic skills & requirements...',
+  'Evaluating quantifiable STAR impact & metrics...',
+  'Synthesizing recruiter redlines & recommendations...',
 ];
 
 export default function AtsChecker() {
@@ -95,11 +108,21 @@ export default function AtsChecker() {
   const [jobPreset, setJobPreset] = useState<string>('google');
   const [customJobDesc, setCustomJobDesc] = useState('');
   const [isScanning, setIsScanning] = useState(false);
+  const [scanStageIndex, setScanStageIndex] = useState(0);
   const [atsResult, setAtsResult] = useState<AtsResult | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>('');
   const [copiedKeyword, setCopiedKeyword] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Animated scan stage progression
+  useEffect(() => {
+    if (!isScanning) return;
+    const interval = setInterval(() => {
+      setScanStageIndex((prev) => (prev + 1) % SCAN_STAGES.length);
+    }, 1100);
+    return () => clearInterval(interval);
+  }, [isScanning]);
 
   const getActiveJobDescription = () => {
     if (customJobDesc.trim()) return customJobDesc;
@@ -109,6 +132,7 @@ export default function AtsChecker() {
 
   const handleRunAnalysis = async () => {
     setIsScanning(true);
+    setScanStageIndex(0);
     setErrorMsg('');
 
     const targetJD = getActiveJobDescription();
@@ -175,8 +199,8 @@ export default function AtsChecker() {
         throw new Error(json.message || 'Analysis error');
       }
     } catch (err: unknown) {
-      // Fallback local deterministic simulation if backend is unreachable
       console.warn('Backend unavailable, running local evaluation fallback:', err);
+      // Fallback local deterministic simulation if backend is unreachable
       setAtsResult({
         overallScore: 88,
         rating: 'Exceptional',
@@ -209,11 +233,12 @@ export default function AtsChecker() {
           },
         ],
         checklist: [
-          { category: 'Contact', item: 'Professional Email & Phone Number', passed: true },
-          { category: 'Online', item: 'GitHub Repository & LinkedIn URL', passed: true },
-          { category: 'Impact', item: 'Quantified Metrics in 3+ bullet points', passed: true },
+          { category: 'Contact Info', item: 'Professional Email & Phone Number', passed: true },
+          { category: 'Online Presence', item: 'GitHub Repository & LinkedIn URL', passed: true },
+          { category: 'Bullet Quality', item: 'Quantified Metrics in 3+ bullet points', passed: true },
           { category: 'Formatting', item: 'Optimal Single-Page Length (450-900 words)', passed: true },
         ],
+        aiPowered: false,
       });
     } finally {
       setIsScanning(false);
@@ -242,7 +267,23 @@ export default function AtsChecker() {
             <span className="font-semibold text-[13px] text-[#71717a]">ATS Diagnostic Scanner</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            <Link
+              to="/skills"
+              className="px-3.5 py-1.5 bg-white border border-[#d4d4d8] text-[#18181b] rounded-md text-[12px] font-bold hover:bg-[#f4f4f5] transition-all flex items-center gap-1.5"
+            >
+              <Award className="w-3.5 h-3.5 text-[#e11d48]" />
+              <span>Skill Tracker</span>
+            </Link>
+
+            <Link
+              to="/challenge/setup"
+              className="px-3.5 py-1.5 bg-white border border-[#d4d4d8] text-[#18181b] rounded-md text-[12px] font-bold hover:bg-[#f4f4f5] transition-all flex items-center gap-1.5"
+            >
+              <Zap className="w-3.5 h-3.5 text-[#e11d48]" />
+              <span>Quick Challenge</span>
+            </Link>
+
             <Link
               to="/builder"
               className="px-3.5 py-1.5 bg-white border border-[#d4d4d8] text-[#18181b] rounded-md text-[12px] font-bold hover:bg-[#f4f4f5] transition-all flex items-center gap-1.5"
@@ -258,14 +299,20 @@ export default function AtsChecker() {
       <div className="max-w-[1240px] mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
         {/* Title Banner */}
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <span className="px-3 py-1 bg-white sketch-border-sm text-[12px] font-mono font-bold text-[#e11d48] inline-block">
-            ENTERPRISE RECRUITER ALGORITHM AUDIT
-          </span>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <span className="px-3 py-1 bg-white sketch-border-sm text-[12px] font-mono font-bold text-[#e11d48] inline-block">
+              ENTERPRISE RECRUITER ALGORITHM AUDIT
+            </span>
+            <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-50 text-purple-800 border border-purple-200 flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-purple-600" />
+              Gemini AI Diagnostics
+            </span>
+          </div>
           <h1 className="text-[32px] sm:text-[42px] font-extrabold tracking-tight text-[#141416]">
             ATS Resume Compliance Diagnostics
           </h1>
           <p className="text-[15px] text-[#6b7280]">
-            Evaluate your technical resume against applicant tracking systems (Greenhouse, Lever, Workday) and top-tier job specifications.
+            Evaluate your technical resume against applicant tracking systems (Greenhouse, Lever, Workday) and top-tier job specifications powered by Google Gemini AI.
           </p>
         </div>
 
@@ -275,7 +322,7 @@ export default function AtsChecker() {
             <div className="flex bg-[#f4f4f5] p-1 rounded-full border border-[#d4d4d8] text-[12px]">
               <button
                 onClick={() => setInputMode('builder')}
-                className={`px-4 py-1.5 rounded-full font-bold transition-all ${
+                className={`px-4 py-1.5 rounded-full font-bold transition-all cursor-pointer ${
                   inputMode === 'builder' ? 'bg-[#e11d48] text-white shadow-xs' : 'text-[#71717a]'
                 }`}
               >
@@ -283,7 +330,7 @@ export default function AtsChecker() {
               </button>
               <button
                 onClick={() => setInputMode('upload')}
-                className={`px-4 py-1.5 rounded-full font-bold transition-all ${
+                className={`px-4 py-1.5 rounded-full font-bold transition-all cursor-pointer ${
                   inputMode === 'upload' ? 'bg-[#e11d48] text-white shadow-xs' : 'text-[#71717a]'
                 }`}
               >
@@ -291,7 +338,7 @@ export default function AtsChecker() {
               </button>
               <button
                 onClick={() => setInputMode('paste')}
-                className={`px-4 py-1.5 rounded-full font-bold transition-all ${
+                className={`px-4 py-1.5 rounded-full font-bold transition-all cursor-pointer ${
                   inputMode === 'paste' ? 'bg-[#e11d48] text-white shadow-xs' : 'text-[#71717a]'
                 }`}
               >
@@ -394,16 +441,16 @@ export default function AtsChecker() {
           </div>
 
           {/* Execute Scan Button */}
-          <div className="flex justify-center pt-2">
+          <div className="flex flex-col items-center justify-center pt-2 gap-2">
             <button
               onClick={handleRunAnalysis}
               disabled={isScanning}
-              className="sketch-btn-red px-8 py-3.5 text-[16px] font-bold flex items-center gap-2 cursor-pointer"
+              className="sketch-btn-red px-8 py-3.5 text-[16px] font-bold flex items-center gap-2 cursor-pointer disabled:opacity-70"
             >
               {isScanning ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Reverse-Engineering ATS Parsers...</span>
+                  <span>{SCAN_STAGES[scanStageIndex]}</span>
                 </>
               ) : (
                 <>
@@ -412,6 +459,10 @@ export default function AtsChecker() {
                 </>
               )}
             </button>
+            <span className="text-[11px] text-[#71717a] flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-purple-500" />
+              Powered by Google Gemini Flash on backend with automatic resilient fallback
+            </span>
           </div>
 
           {errorMsg && (
@@ -458,7 +509,7 @@ export default function AtsChecker() {
                     </div>
                   </div>
 
-                  <div className="mt-3">
+                  <div className="mt-3 flex items-center gap-2">
                     <span
                       className={`px-3 py-1 rounded-full text-[12px] font-bold ${
                         atsResult.overallScore >= 80
@@ -473,14 +524,25 @@ export default function AtsChecker() {
 
                 {/* Score Description & 4 Pillars */}
                 <div className="md:col-span-8 space-y-4">
-                  <div>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <h3 className="text-[20px] font-bold text-[#141416]">
                       ATS Compatibility Assessment
                     </h3>
-                    <p className="text-[13px] text-[#4b5563] mt-1 leading-relaxed">
-                      {atsResult.summaryFeedback}
-                    </p>
+                    {atsResult.aiPowered ? (
+                      <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-200 flex items-center gap-1.5 shadow-2xs">
+                        <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                        <span>Gemini AI Engine ({atsResult.modelUsed || 'Flash'})</span>
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-stone-100 text-stone-700 border border-stone-300 flex items-center gap-1.5 shadow-2xs">
+                        <Cpu className="w-3.5 h-3.5 text-stone-600" />
+                        <span>Algorithmic Heuristic Mode</span>
+                      </span>
+                    )}
                   </div>
+                  <p className="text-[13px] text-[#4b5563] mt-1 leading-relaxed">
+                    {atsResult.summaryFeedback}
+                  </p>
 
                   {/* 4 Pillars Progress Bars */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
@@ -491,7 +553,7 @@ export default function AtsChecker() {
                       </div>
                       <div className="w-full bg-[#e4e4e7] h-2 rounded-full overflow-hidden">
                         <div
-                          className="bg-[#e11d48] h-full rounded-full"
+                          className="bg-[#e11d48] h-full rounded-full transition-all duration-700"
                           style={{ width: `${atsResult.scores.keywordMatch}%` }}
                         />
                       </div>
@@ -504,7 +566,7 @@ export default function AtsChecker() {
                       </div>
                       <div className="w-full bg-[#e4e4e7] h-2 rounded-full overflow-hidden">
                         <div
-                          className="bg-[#0066cc] h-full rounded-full"
+                          className="bg-[#0066cc] h-full rounded-full transition-all duration-700"
                           style={{ width: `${atsResult.scores.quantifiableImpact}%` }}
                         />
                       </div>
@@ -517,7 +579,7 @@ export default function AtsChecker() {
                       </div>
                       <div className="w-full bg-[#e4e4e7] h-2 rounded-full overflow-hidden">
                         <div
-                          className="bg-emerald-600 h-full rounded-full"
+                          className="bg-emerald-600 h-full rounded-full transition-all duration-700"
                           style={{ width: `${atsResult.scores.structureAndFormat}%` }}
                         />
                       </div>
@@ -530,7 +592,7 @@ export default function AtsChecker() {
                       </div>
                       <div className="w-full bg-[#e4e4e7] h-2 rounded-full overflow-hidden">
                         <div
-                          className="bg-purple-600 h-full rounded-full"
+                          className="bg-purple-600 h-full rounded-full transition-all duration-700"
                           style={{ width: `${atsResult.scores.readabilityAndLength}%` }}
                         />
                       </div>
@@ -599,9 +661,16 @@ export default function AtsChecker() {
             {atsResult.bulletRedlines.length > 0 && (
               <div className="sketch-card p-6 sm:p-8 bg-white space-y-4">
                 <div className="flex items-center justify-between border-b-2 border-dashed border-[#e5e7eb] pb-3">
-                  <span className="font-bold text-[16px] text-[#141416]">
-                    Actionable Bullet Point Redlines (Google XYZ Formula)
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-[16px] text-[#141416]">
+                      Actionable Bullet Point Redlines (Google XYZ Formula)
+                    </span>
+                    {atsResult.aiPowered && (
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                        AI Generated
+                      </span>
+                    )}
+                  </div>
                   <span className="text-[11px] font-mono text-[#e11d48] font-bold">
                     HIGH RECRUITER SIGNAL
                   </span>
