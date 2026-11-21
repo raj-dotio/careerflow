@@ -17,7 +17,6 @@ import {
   Flame,
   CheckCircle2,
   Send,
-  BookOpen,
   Bot,
   MessageSquare,
 } from 'lucide-react';
@@ -320,7 +319,7 @@ export default function Home() {
           1. TOP NAVIGATION BAR (Clean, Minimal, Transparent Header)
       ========================================================================= */}
       <header className="sticky top-0 z-50 pt-3 px-4 sm:px-6 pb-2.5 bg-[#faf8f5]/90 backdrop-blur-md">
-        <div className="max-w-[1240px] mx-auto flex items-center justify-between gap-6">
+        <div className="max-w-[1240px] mx-auto flex items-center justify-between gap-4">
           {/* Brand Logo - Enlarged */}
           <Link
             to="/"
@@ -329,8 +328,8 @@ export default function Home() {
             <img src={logo2} alt="CareerFlow Logo" className="h-14 sm:h-16 md:h-20 w-auto object-contain" />
           </Link>
 
-          {/* Central Navigation - Minimal & Spaced Out (No Black Pill BG) */}
-          <nav className="hidden md:flex items-center gap-7 lg:gap-10 text-[14px] lg:text-[15px] font-semibold text-[#3f3f46]">
+          {/* Central Navigation - Centered */}
+          <nav className="hidden md:flex items-center justify-center gap-6 lg:gap-8 text-[13.5px] lg:text-[14px] font-semibold text-[#3f3f46] mx-auto">
             <Link
               to="/builder"
               className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
@@ -346,19 +345,19 @@ export default function Home() {
               <span>ATS Diagnostics</span>
             </Link>
             <Link
+              to="/goals"
+              className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap font-bold"
+            >
+              <Flame className="w-4 h-4 text-[#e11d48]" />
+              <span>Daily Streaks</span>
+            </Link>
+            <Link
               to="/mock-chamber"
               className="flex items-center gap-2 text-[#e11d48] hover:text-[#be123c] transition-colors whitespace-nowrap font-bold"
             >
               <Bot className="w-4 h-4 text-[#e11d48]" />
               <span>AI Mock Chamber</span>
             </Link>
-            <a
-              href="#journey"
-              className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
-            >
-              <BookOpen className="w-4 h-4 text-[#71717a]" />
-              <span>Milestones</span>
-            </a>
             <a
               href="#student-quiz"
               className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
@@ -368,23 +367,9 @@ export default function Home() {
             </a>
           </nav>
 
-          {/* Right Action Buttons */}
-          <div className="flex items-center gap-3 shrink-0">
-            <button
-              onClick={handleTossCaps}
-              className="hidden lg:flex items-center gap-1.5 px-3.5 py-1.5 bg-white text-[#141416] sketch-border-sm text-[12px] font-bold hover:bg-[#f4f4f5] active:scale-95 transition-all whitespace-nowrap cursor-pointer"
-              title="Click to celebrate and toss graduation hats!"
-            >
-              <GraduationCap className="w-3.5 h-3.5 text-[#e11d48]" />
-              <span className="whitespace-nowrap">Toss Scholar Hat</span>
-            </button>
-            <a
-              href="#simulation"
-              className="flex items-center gap-2 px-4 py-2 bg-white text-[#141416] sketch-border-sm text-[12px] font-bold hover:bg-[#f4f4f5] transition-all whitespace-nowrap shadow-xs"
-            >
-              <span className="w-2 h-2 rounded-full bg-[#e11d48] animate-ping shrink-0" />
-              <span className="whitespace-nowrap">Join Placement Cohort</span>
-            </a>
+          {/* Balanced right spacer matching logo size for clean centering */}
+          <div className="hidden md:block shrink-0 opacity-0 pointer-events-none select-none" aria-hidden="true">
+            <img src={logo2} alt="" className="h-12 sm:h-14 md:h-16 w-auto object-contain" />
           </div>
         </div>
 
@@ -425,16 +410,24 @@ export default function Home() {
           {/* Main Action Sketched Red Button with Icon Logo */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link
-              to="/builder"
-              className="sketch-btn-red px-7 py-3.5 text-[17px] flex items-center gap-2.5 cursor-pointer"
+              to="/goals"
+              className="sketch-btn-red px-7 py-3.5 text-[17px] flex items-center gap-2.5 cursor-pointer shadow-md hover:scale-102 transition-transform"
             >
-              <FileText className="w-5 h-5 text-white" />
-              <span>Open Reactive Resume Builder</span>
+              <Flame className="w-5 h-5 fill-white text-white animate-bounce" />
+              <span>Daily Streak &amp; Goals Matrix</span>
+            </Link>
+
+            <Link
+              to="/builder"
+              className="sketch-btn-white px-6 py-3.5 text-[16px] flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors"
+            >
+              <FileText className="w-4 h-4 text-[#e11d48]" />
+              <span>Reactive Resume Builder</span>
             </Link>
 
             <Link
               to="/ats"
-              className="sketch-btn-white px-6 py-3.5 text-[16px] flex items-center gap-2 cursor-pointer"
+              className="sketch-btn-white px-6 py-3.5 text-[16px] flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors"
             >
               <Sparkles className="w-4 h-4 text-[#e11d48]" />
               <span>Run Live ATS Checker</span>
