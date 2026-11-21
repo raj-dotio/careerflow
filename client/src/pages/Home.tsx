@@ -366,13 +366,13 @@ export default function Home() {
               <BookOpen className="w-4 h-4 text-[#71717a]" />
               <span>Milestones</span>
             </a>
-            <a
-              href="#student-quiz"
+            <Link
+              to="/challenge/setup"
               className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
             >
               <Zap className="w-4 h-4 text-[#71717a]" />
               <span>Quick Challenge</span>
-            </a>
+            </Link>
           </nav>
 
           {/* Right Action Buttons */}

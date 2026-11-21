@@ -142,10 +142,11 @@ Analyze and return JSON matching this exact structure:
 `;
 
   const modelsToTry = [
+    'gemini-3.5-flash-lite',
     'gemini-3.5-flash',
+    'gemini-3.6-flash',
     'gemini-3.7-flash',
     'gemini-3.8-flash',
-    'gemini-3.5-flash-lite',
   ];
   const ai = new GoogleGenAI({ apiKey });
 

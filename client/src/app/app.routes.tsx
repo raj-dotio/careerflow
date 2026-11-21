@@ -3,6 +3,9 @@ import Home from '../pages/Home';
 import ResumeBuilder from '../pages/ResumeBuilder';
 import AtsChecker from '../pages/AtsChecker';
 import SkillTracker from '../pages/SkillTracker';
+import QuickChallengeSetup from '../pages/QuickChallengeSetup';
+import LiveChallenge from '../pages/LiveChallenge';
+import ChallengeResults from '../pages/ChallengeResults';
 
 function RouteErrorBoundary() {
   const error = useRouteError() as { message?: string };
@@ -55,6 +58,21 @@ export const router = createBrowserRouter([
   {
     path: '/skills',
     element: <SkillTracker />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: '/challenge/setup',
+    element: <QuickChallengeSetup />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: '/challenge/:id',
+    element: <LiveChallenge />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: '/challenge/:id/results',
+    element: <ChallengeResults />,
     errorElement: <RouteErrorBoundary />,
   },
 ]);

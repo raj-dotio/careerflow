@@ -20,6 +20,7 @@ import {
   Mail,
   Phone,
   MapPin,
+  Zap,
 } from 'lucide-react';
 import { type ResumeData, initialSampleResume } from '../utils/sampleResume';
 
@@ -279,6 +280,14 @@ export default function ResumeBuilder() {
             >
               <Award className="w-3.5 h-3.5 text-[#e11d48]" />
               <span>Skill Tracker</span>
+            </Link>
+
+            <Link
+              to="/challenge/setup"
+              className="px-3 py-1.5 bg-white border border-[#d4d4d8] text-[#18181b] rounded-md text-[12px] font-bold hover:bg-[#f4f4f5] transition-all flex items-center gap-1.5"
+            >
+              <Zap className="w-3.5 h-3.5 text-[#e11d48]" />
+              <span>Quick Challenge</span>
             </Link>
 
             <button
