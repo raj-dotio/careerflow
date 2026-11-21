@@ -319,7 +319,7 @@ export default function Home() {
           1. TOP NAVIGATION BAR (Clean, Minimal, Transparent Header)
       ========================================================================= */}
       <header className="sticky top-0 z-50 pt-3 px-4 sm:px-6 pb-2.5 bg-[#faf8f5]/90 backdrop-blur-md">
-        <div className="max-w-[1240px] mx-auto flex items-center justify-between gap-6">
+        <div className="max-w-[1240px] mx-auto flex items-center justify-between gap-4">
           {/* Brand Logo - Enlarged */}
           <Link
             to="/"
@@ -328,8 +328,8 @@ export default function Home() {
             <img src={logo2} alt="CareerFlow Logo" className="h-12 sm:h-14 md:h-16 w-auto object-contain" />
           </Link>
 
-          {/* Central Navigation - Minimal & Spaced Out (No Black Pill BG) */}
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-[13.5px] lg:text-[14px] font-semibold text-[#3f3f46]">
+          {/* Central Navigation - Centered */}
+          <nav className="hidden md:flex items-center justify-center gap-6 lg:gap-8 text-[13.5px] lg:text-[14px] font-semibold text-[#3f3f46] mx-auto">
             <Link
               to="/builder"
               className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
@@ -366,6 +366,11 @@ export default function Home() {
               <span>Quick Challenge</span>
             </a>
           </nav>
+
+          {/* Balanced right spacer matching logo size for clean centering */}
+          <div className="hidden md:block shrink-0 opacity-0 pointer-events-none select-none" aria-hidden="true">
+            <img src={logo2} alt="" className="h-12 sm:h-14 md:h-16 w-auto object-contain" />
+          </div>
         </div>
 
         {/* THE RED THREAD OF PLACEMENT FATE (Wavy Line from Reference Images 1 & 4) */}
