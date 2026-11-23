@@ -16,8 +16,8 @@ dist-ssr/
 !**/.env.example
 
 # Uploads and temporary files
-server/public/*
-!server/public/.gitkeep
+uploads/
+*/uploads/
 
 # Temporary / reference folders
 another*server*

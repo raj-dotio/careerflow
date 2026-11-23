@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "tsx watch server.ts",
     "build": "tsc",
+    "build:client": "cd ../client && npm run build && cp -r dist/* ../server/public/",
+    "build:all": "npm run build:client && npm run build",
     "start": "node dist/server.js"
   },
   "keywords": [],
