@@ -39,11 +39,12 @@ const publicDir = findPublicDir();
 
 const app: Application = express();
 
-// Security Middlewares (relaxed CSP & COEP so modern Vite bundle, media, & Firebase auth work smoothly)
+// Security Middlewares (relaxed CSP, COEP & COOP so modern Vite bundle, media, & Firebase auth popups work smoothly)
 app.use(
   helmet({
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: false,
   })
 );
 
