@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 import RouteErrorBoundary from '../components/RouteErrorBoundary';
+import ProtectedRoute from '../components/auth/ProtectedRoute';
 import Home from '../pages/Home';
 import ResumeBuilder from '../pages/ResumeBuilder';
 import AtsChecker from '../pages/AtsChecker';
@@ -21,67 +22,119 @@ export const router = createBrowserRouter([
   },
   {
     path: '/builder',
-    element: <ResumeBuilder />,
+    element: (
+      <ProtectedRoute>
+        <ResumeBuilder />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteErrorBoundary />,
   },
   {
     path: '/builder/:id',
-    element: <ResumeBuilder />,
+    element: (
+      <ProtectedRoute>
+        <ResumeBuilder />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteErrorBoundary />,
   },
   {
     path: '/ats',
-    element: <AtsChecker />,
+    element: (
+      <ProtectedRoute>
+        <AtsChecker />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteErrorBoundary />,
   },
   {
     path: '/goals',
-    element: <DailyGoals />,
+    element: (
+      <ProtectedRoute>
+        <DailyGoals />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteErrorBoundary />,
   },
   {
     path: '/dashboard',
-    element: <DailyGoals />,
+    element: (
+      <ProtectedRoute>
+        <DailyGoals />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteErrorBoundary />,
   },
   {
     path: '/mock-chamber',
-    element: <MockChamberLanding />,
+    element: (
+      <ProtectedRoute>
+        <MockChamberLanding />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteErrorBoundary />,
   },
   {
     path: '/mock-chamber/room',
-    element: <MockChamberRoom />,
+    element: (
+      <ProtectedRoute>
+        <MockChamberRoom />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteErrorBoundary />,
   },
   {
     path: '/mock-chamber/report/:id',
-    element: <MockChamberReport />,
+    element: (
+      <ProtectedRoute>
+        <MockChamberReport />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteErrorBoundary />,
   },
   {
     path: '/roadmap',
-    element: <RoadmapPage />,
+    element: (
+      <ProtectedRoute>
+        <RoadmapPage />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteErrorBoundary />,
   },
   {
     path: '/skills',
-    element: <SkillTracker />,
+    element: (
+      <ProtectedRoute>
+        <SkillTracker />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteErrorBoundary />,
   },
   {
     path: '/challenge/setup',
-    element: <QuickChallengeSetup />,
+    element: (
+      <ProtectedRoute>
+        <QuickChallengeSetup />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteErrorBoundary />,
   },
   {
     path: '/challenge/:id',
-    element: <LiveChallenge />,
+    element: (
+      <ProtectedRoute>
+        <LiveChallenge />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteErrorBoundary />,
   },
   {
     path: '/challenge/:id/results',
-    element: <ChallengeResults />,
+    element: (
+      <ProtectedRoute>
+        <ChallengeResults />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteErrorBoundary />,
   },
 ]);

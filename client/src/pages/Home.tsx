@@ -20,7 +20,17 @@ import {
   Bot,
   MessageSquare,
   Compass,
+  LogIn,
+  LogOut,
+  ChevronDown,
+  Coins,
 } from 'lucide-react';
+
+import { signOut } from 'firebase/auth';
+import { useAppDispatch, useAppSelector } from '../redux/store';
+import { openAuthModal, clearUser, setUser } from '../redux/userSlice';
+import { auth } from '../utils/firebase';
+import AuthModal from '../components/auth/AuthModal';
 
 import femaleAiVideo from '../assets/videos/female-ai.mp4';
 import maleAiVideo from '../assets/videos/male-ai.mp4';
@@ -39,6 +49,11 @@ interface FlyingCap {
 }
 
 export default function Home() {
+  const dispatch = useAppDispatch();
+  const { user, isAuthenticated } = useAppSelector((state) => state.user);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileDropdownRef = useRef<HTMLDivElement | null>(null);
+
   const [scrollY, setScrollY] = useState(0);
 
   // Video interviewer state
@@ -76,6 +91,74 @@ export default function Home() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Sync / verify user session with backend if cookie exists
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const res = await fetch('/api/auth/me', { credentials: 'include' });
+        if (res.ok) {
+          const dbUser = await res.json();
+          if (dbUser && dbUser.email) {
+            dispatch(
+              setUser({
+                _id: dbUser._id,
+                name: dbUser.name,
+                displayName: dbUser.name,
+                email: dbUser.email,
+                photoURL: user?.photoURL || null,
+                role: dbUser.role || 'student',
+                credits: dbUser.credits ?? 1000,
+                streakCount: dbUser.streakCount ?? 0,
+              })
+            );
+          }
+        }
+      } catch {
+        // Offline or unauthenticated
+      }
+    };
+    checkSession();
+  }, [dispatch]);
+
+  // Click outside listener for user profile dropdown
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    setIsProfileOpen(false);
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (err) {
+      console.error('Backend logout error:', err);
+    }
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error('Firebase signout error:', err);
+    }
+    dispatch(clearUser());
+  };
+
+  const handleFeatureClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated || !user) {
+      e.preventDefault();
+      dispatch(openAuthModal());
+    }
+  };
 
   const toggleVideoPlayback = () => {
     if (videoRef.current) {
@@ -333,6 +416,7 @@ export default function Home() {
           <nav className="hidden md:flex items-center justify-center gap-6 lg:gap-8 text-[13.5px] lg:text-[14px] font-semibold text-[#3f3f46] mx-auto">
             <Link
               to="/roadmap"
+              onClick={handleFeatureClick}
               className="flex items-center gap-2 text-[#e11d48] hover:text-[#be123c] transition-colors whitespace-nowrap font-bold"
             >
               <Compass className="w-4 h-4 text-[#e11d48]" />
@@ -340,6 +424,7 @@ export default function Home() {
             </Link>
             <Link
               to="/builder"
+              onClick={handleFeatureClick}
               className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
             >
               <FileText className="w-4 h-4 text-[#71717a]" />
@@ -347,6 +432,7 @@ export default function Home() {
             </Link>
             <Link
               to="/ats"
+              onClick={handleFeatureClick}
               className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
             >
               <Sparkles className="w-4 h-4 text-[#71717a]" />
@@ -354,6 +440,7 @@ export default function Home() {
             </Link>
             <Link
               to="/goals"
+              onClick={handleFeatureClick}
               className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap font-bold"
             >
               <Flame className="w-4 h-4 text-[#e11d48]" />
@@ -361,6 +448,7 @@ export default function Home() {
             </Link>
             <Link
               to="/skills"
+              onClick={handleFeatureClick}
               className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
             >
               <Award className="w-4 h-4 text-[#71717a]" />
@@ -368,6 +456,7 @@ export default function Home() {
             </Link>
             <Link
               to="/mock-chamber"
+              onClick={handleFeatureClick}
               className="flex items-center gap-2 text-[#e11d48] hover:text-[#be123c] transition-colors whitespace-nowrap font-bold"
             >
               <Bot className="w-4 h-4 text-[#e11d48]" />
@@ -375,6 +464,7 @@ export default function Home() {
             </Link>
             <Link
               to="/challenge/setup"
+              onClick={handleFeatureClick}
               className="flex items-center gap-2 hover:text-[#e11d48] transition-colors whitespace-nowrap"
             >
               <Zap className="w-4 h-4 text-[#71717a]" />
@@ -382,9 +472,118 @@ export default function Home() {
             </Link>
           </nav>
 
-          {/* Balanced right spacer matching logo size for clean centering */}
-          <div className="hidden md:block shrink-0 opacity-0 pointer-events-none select-none" aria-hidden="true">
-            <img src={logo2} alt="" className="h-12 sm:h-14 md:h-16 w-auto object-contain" />
+          {/* Right Area: Sign In or User Profile Avatar */}
+          <div className="flex items-center gap-3 shrink-0">
+            {!isAuthenticated || !user ? (
+              <button
+                onClick={() => dispatch(openAuthModal())}
+                className="sketch-btn-red text-[13px] font-bold px-4 py-2 flex items-center gap-2 cursor-pointer shadow-[2px_2px_0px_#18181b] hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Sign In</span>
+              </button>
+            ) : (
+              <div className="relative" ref={profileDropdownRef}>
+                <button
+                  onClick={() => setIsProfileOpen((prev) => !prev)}
+                  className="flex items-center gap-2 p-1 rounded-full hover:bg-slate-100 transition-colors cursor-pointer focus:outline-none"
+                  aria-label="User profile menu"
+                >
+                  {user.photoURL ? (
+                    <img
+                      src={user.photoURL}
+                      alt={user.name || user.displayName || 'User'}
+                      className="w-10 h-10 rounded-full border-2 border-[#18181b] object-cover shadow-[2px_2px_0px_#18181b]"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full border-2 border-[#18181b] bg-[#e11d48] text-white flex items-center justify-center font-black text-sm shadow-[2px_2px_0px_#18181b]">
+                      {(user.name || user.displayName || user.email || 'S')[0].toUpperCase()}
+                    </div>
+                  )}
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-[#18181b] transition-transform duration-200 ${
+                      isProfileOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+
+                {isProfileOpen && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white border-2 border-[#18181b] shadow-[6px_6px_0px_#18181b] rounded-lg p-3 z-50 animate-in fade-in zoom-in-95">
+                    <div className="pb-3 border-b border-[#e4e4e7]">
+                      <div className="flex items-center gap-2.5">
+                        {user.photoURL ? (
+                          <img
+                            src={user.photoURL}
+                            alt={user.name || 'User'}
+                            className="w-9 h-9 rounded-full border border-[#18181b] object-cover"
+                          />
+                        ) : (
+                          <div className="w-9 h-9 rounded-full bg-[#18181b] text-white flex items-center justify-center font-bold text-xs">
+                            {(user.name || user.displayName || user.email || 'S')[0].toUpperCase()}
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-bold text-[#141416] truncate">
+                            {user.name || user.displayName || 'Student'}
+                          </p>
+                          <p className="text-[11px] text-[#71717a] truncate font-medium">
+                            {user.email || 'No email'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-2.5 flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#fff1f2] border border-[#e11d48] text-[10px] font-black text-[#e11d48]">
+                          <Coins className="w-3 h-3" />
+                          <span>{user.credits ?? 1000} Credits</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#faf8f5] border border-[#18181b] text-[10px] font-black text-[#141416]">
+                          <Flame className="w-3 h-3 text-[#e11d48]" />
+                          <span>{user.streakCount ?? 0}d Streak</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="py-2 space-y-1">
+                      <Link
+                        to="/goals"
+                        onClick={() => setIsProfileOpen(false)}
+                        className="flex items-center gap-2 px-2.5 py-1.5 text-xs font-bold text-[#3f3f46] hover:bg-[#fff1f2] hover:text-[#e11d48] rounded transition-colors"
+                      >
+                        <Flame className="w-3.5 h-3.5 text-[#e11d48]" />
+                        <span>Daily Goals Matrix</span>
+                      </Link>
+                      <Link
+                        to="/roadmap"
+                        onClick={() => setIsProfileOpen(false)}
+                        className="flex items-center gap-2 px-2.5 py-1.5 text-xs font-bold text-[#3f3f46] hover:bg-[#fff1f2] hover:text-[#e11d48] rounded transition-colors"
+                      >
+                        <Compass className="w-3.5 h-3.5 text-[#e11d48]" />
+                        <span>My Learning Roadmap</span>
+                      </Link>
+                      <Link
+                        to="/builder"
+                        onClick={() => setIsProfileOpen(false)}
+                        className="flex items-center gap-2 px-2.5 py-1.5 text-xs font-bold text-[#3f3f46] hover:bg-[#fff1f2] hover:text-[#e11d48] rounded transition-colors"
+                      >
+                        <FileText className="w-3.5 h-3.5 text-[#71717a]" />
+                        <span>Resume Builder</span>
+                      </Link>
+                    </div>
+
+                    <div className="pt-2 border-t border-[#e4e4e7]">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2 px-2.5 py-1.5 text-xs font-bold text-[#e11d48] hover:bg-[#fff1f2] rounded transition-colors cursor-pointer text-left"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -426,6 +625,7 @@ export default function Home() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link
               to="/goals"
+              onClick={handleFeatureClick}
               className="sketch-btn-red px-7 py-3.5 text-[17px] flex items-center gap-2.5 cursor-pointer shadow-md hover:scale-102 transition-transform"
             >
               <Flame className="w-5 h-5 fill-white text-white animate-bounce" />
@@ -434,6 +634,7 @@ export default function Home() {
 
             <Link
               to="/roadmap"
+              onClick={handleFeatureClick}
               className="sketch-btn-white px-6 py-3.5 text-[16px] flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors"
             >
               <Compass className="w-4 h-4 text-[#e11d48]" />
@@ -442,6 +643,7 @@ export default function Home() {
 
             <Link
               to="/builder"
+              onClick={handleFeatureClick}
               className="sketch-btn-white px-6 py-3.5 text-[16px] flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors"
             >
               <FileText className="w-4 h-4 text-[#e11d48]" />
@@ -450,6 +652,7 @@ export default function Home() {
 
             <Link
               to="/ats"
+              onClick={handleFeatureClick}
               className="sketch-btn-white px-6 py-3.5 text-[16px] flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors"
             >
               <Sparkles className="w-4 h-4 text-[#e11d48]" />
@@ -459,6 +662,7 @@ export default function Home() {
 
             <Link
               to="/mock-chamber"
+              onClick={handleFeatureClick}
               className="sketch-btn-white px-6 py-3.5 text-[16px] flex items-center gap-2 cursor-pointer bg-white border-2 border-[#18181b] hover:bg-[#fff1f2]"
             >
               <Bot className="w-4 h-4 text-[#e11d48]" />
@@ -1210,6 +1414,9 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Global Auth Login Modal */}
+      <AuthModal />
     </div>
   );
 }
