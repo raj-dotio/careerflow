@@ -402,18 +402,18 @@ export default function Home() {
       {/* =========================================================================
           1. TOP NAVIGATION BAR (Clean, Minimal, Transparent Header)
       ========================================================================= */}
-      <header className="sticky top-0 z-50 pt-3 px-4 sm:px-6 pb-2.5 bg-[#faf8f5]/90 backdrop-blur-md">
-        <div className="max-w-[1240px] mx-auto flex items-center justify-between gap-4">
-          {/* Brand Logo - Enlarged */}
+      <header className="sticky top-0 z-50 pt-2.5 px-4 sm:px-8 lg:px-12 xl:px-14 pb-2.5 bg-[#faf8f5]/90 backdrop-blur-md">
+        <div className="w-full max-w-[1720px] mx-auto flex items-center justify-between gap-4 lg:gap-8">
+          {/* Brand Logo - Aligned to Far Left */}
           <Link
             to="/"
             className="flex items-center gap-2 hover:opacity-90 transition-opacity shrink-0"
           >
-            <img src={logo2} alt="CareerFlow Logo" className="h-14 sm:h-16 md:h-20 w-auto object-contain" />
+            <img src={logo2} alt="CareerFlow Logo" className="h-14 sm:h-16 md:h-18 w-auto object-contain" />
           </Link>
 
-          {/* Central Navigation - Centered */}
-          <nav className="hidden md:flex items-center justify-center gap-6 lg:gap-8 text-[13.5px] lg:text-[14px] font-semibold text-[#3f3f46] mx-auto">
+          {/* Central Navigation - Centered with balanced spacing */}
+          <nav className="hidden md:flex items-center justify-center gap-3.5 lg:gap-5 xl:gap-7 text-[13px] lg:text-[13.5px] xl:text-[14px] font-semibold text-[#3f3f46] mx-auto">
             <Link
               to="/roadmap"
               onClick={handleFeatureClick}
