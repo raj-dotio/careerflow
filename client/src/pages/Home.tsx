@@ -28,9 +28,10 @@ import {
 
 import { signOut } from 'firebase/auth';
 import { useAppDispatch, useAppSelector } from '../redux/store';
-import { openAuthModal, clearUser, setUser } from '../redux/userSlice';
+import { openAuthModal, clearUser, setUser, updateUserProfile } from '../redux/userSlice';
 import { auth } from '../utils/firebase';
 import AuthModal from '../components/auth/AuthModal';
+import UserAvatar from '../components/common/UserAvatar';
 
 import femaleAiVideo from '../assets/videos/female-ai.mp4';
 import maleAiVideo from '../assets/videos/male-ai.mp4';
@@ -486,20 +487,10 @@ export default function Home() {
               <div className="relative" ref={profileDropdownRef}>
                 <button
                   onClick={() => setIsProfileOpen((prev) => !prev)}
-                  className="flex items-center gap-2 p-1 rounded-full hover:bg-slate-100 transition-colors cursor-pointer focus:outline-none"
+                  className="flex items-center gap-1.5 p-0.5 rounded-full hover:bg-black/5 transition-colors cursor-pointer focus:outline-none group"
                   aria-label="User profile menu"
                 >
-                  {user.photoURL ? (
-                    <img
-                      src={user.photoURL}
-                      alt={user.name || user.displayName || 'User'}
-                      className="w-10 h-10 rounded-full border-2 border-[#18181b] object-cover shadow-[2px_2px_0px_#18181b]"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full border-2 border-[#18181b] bg-[#e11d48] text-white flex items-center justify-center font-black text-sm shadow-[2px_2px_0px_#18181b]">
-                      {(user.name || user.displayName || user.email || 'S')[0].toUpperCase()}
-                    </div>
-                  )}
+                  <UserAvatar user={user} size="lg" />
                   <ChevronDown
                     className={`w-3.5 h-3.5 text-[#18181b] transition-transform duration-200 ${
                       isProfileOpen ? 'rotate-180' : ''
@@ -508,27 +499,62 @@ export default function Home() {
                 </button>
 
                 {isProfileOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white border-2 border-[#18181b] shadow-[6px_6px_0px_#18181b] rounded-lg p-3 z-50 animate-in fade-in zoom-in-95">
+                  <div className="absolute right-0 mt-2 w-72 bg-white border-2 border-[#18181b] shadow-[6px_6px_0px_#18181b] rounded-lg p-3 z-50 animate-in fade-in zoom-in-95">
                     <div className="pb-3 border-b border-[#e4e4e7]">
                       <div className="flex items-center gap-2.5">
-                        {user.photoURL ? (
-                          <img
-                            src={user.photoURL}
-                            alt={user.name || 'User'}
-                            className="w-9 h-9 rounded-full border border-[#18181b] object-cover"
-                          />
-                        ) : (
-                          <div className="w-9 h-9 rounded-full bg-[#18181b] text-white flex items-center justify-center font-bold text-xs">
-                            {(user.name || user.displayName || user.email || 'S')[0].toUpperCase()}
-                          </div>
-                        )}
+                        <UserAvatar user={user} size="md" />
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-bold text-[#141416] truncate">
-                            {user.name || user.displayName || 'Student'}
-                          </p>
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-sm font-bold text-[#141416] truncate">
+                              {user.name || user.displayName || 'Student Pioneer'}
+                            </p>
+                          </div>
                           <p className="text-[11px] text-[#71717a] truncate font-medium">
-                            {user.email || 'No email'}
+                            {user.email || 'student@careerflow.in'}
                           </p>
+                        </div>
+                      </div>
+
+                      {/* Avatar Preset Quick Selector */}
+                      <div className="mt-2.5 pt-2 border-t border-dashed border-[#e4e4e7]">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[10px] font-black uppercase tracking-wider text-[#71717a]">
+                            Profile Icon
+                          </span>
+                          <span className="text-[10px] font-semibold text-[#e11d48]">
+                            {user.avatarIcon === 'coder'
+                              ? '⚡ Coder'
+                              : user.avatarIcon === 'ai'
+                              ? '🤖 AI Pioneer'
+                              : user.avatarIcon === 'pro'
+                              ? '🏆 Pro'
+                              : '🎓 Graduate'}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {[
+                            { id: 'graduate', label: 'Graduate', icon: GraduationCap, bg: 'bg-[#fff1f2] border-[#e11d48] text-[#e11d48]' },
+                            { id: 'coder', label: 'Coder', icon: Zap, bg: 'bg-[#ecfdf5] border-[#059669] text-[#059669]' },
+                            { id: 'ai', label: 'AI Pioneer', icon: Sparkles, bg: 'bg-[#eff6ff] border-[#2563eb] text-[#2563eb]' },
+                            { id: 'pro', label: 'Pro', icon: Award, bg: 'bg-[#f4f4f5] border-[#18181b] text-[#18181b]' },
+                          ].map((item) => {
+                            const isSelected = (user.avatarIcon || 'graduate') === item.id;
+                            return (
+                              <button
+                                key={item.id}
+                                type="button"
+                                onClick={() => dispatch(updateUserProfile({ avatarIcon: item.id }))}
+                                className={`flex-1 py-1 px-1.5 rounded border flex items-center justify-center transition-all cursor-pointer ${
+                                  isSelected
+                                    ? `${item.bg} border-2 border-[#18181b] shadow-[1px_1px_0px_#18181b] font-bold`
+                                    : 'bg-white border-[#e4e4e7] text-[#71717a] hover:border-[#18181b] hover:text-[#18181b]'
+                                }`}
+                                title={item.label}
+                              >
+                                <item.icon className="w-3.5 h-3.5" />
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
 

@@ -7,6 +7,7 @@ export interface UserProfile {
   displayName?: string | null;
   name?: string;
   photoURL?: string | null;
+  avatarIcon?: string | null;
   role?: 'student' | 'admin';
   college?: string;
   branch?: string;
