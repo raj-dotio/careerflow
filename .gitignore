@@ -9,9 +9,11 @@ dist-ssr/
 
 # Environment and sensitive keys
 .env
-.env*.local
-*/.env
-*/.env*.local
+.env*
+!.env.example
+**/.env
+**/.env*
+!**/.env.example
 
 # Uploads and temporary files
 server/public/*
